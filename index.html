@@ -1048,7 +1048,7 @@
       <p style="font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: #d4a5ff; margin-top: 16px;">Aceptas?</p>
       <div id="yes-no-container">
         <button id="yes-btn" onclick="answerYes()">Si</button>
-        <button id="no-btn" onmouseover="dodgeNo()" ontouchstart="dodgeNo()" onclick="answerNo()">No</button>
+        <button id="no-btn" onmouseover="dodgeNo()" ontouchstart="dodgeNoMobile(event)">No</button>
       </div>
     </div>
   </div>
@@ -2055,20 +2055,16 @@
     function dodgeNo() {
       const btn = document.getElementById('no-btn');
       const maxX = window.innerWidth * 0.3;
-      const maxY = window.innerHeight * 0.2;
+      const maxY = window.innerHeight * 0.15;
       const rx = (Math.random() - 0.5) * maxX * 2;
       const ry = (Math.random() - 0.5) * maxY * 2;
       btn.style.position = 'relative';
       btn.style.transform = `translate(${rx}px, ${ry}px)`;
     }
 
-    function answerNo() {
-      document.getElementById('card-screen').classList.add('fade-out');
-      setTimeout(() => {
-        document.getElementById('card-screen').classList.add('hidden');
-        document.getElementById('card-screen').classList.remove('fade-out');
-        playEnding('videos/last_scene.mp4', 'assets/sounds_of_silence.mp3');
-      }, 600);
+    function dodgeNoMobile(e) {
+      e.preventDefault(); // Block the tap from becoming a click
+      dodgeNo();
     }
 
     function answerYes() {

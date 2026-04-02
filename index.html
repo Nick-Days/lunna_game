@@ -895,7 +895,6 @@
   <!-- ===== VIDEO SCREEN ===== -->
   <div id="video-screen" class="fullscreen-overlay hidden">
     <video id="video-player" playsinline></video>
-    <button id="skip-btn" onclick="skipVideo()">Saltar ></button>
     <!-- Jugar button overlay - appears at end of opening.mp4 -->
     <div id="jugar-overlay" class="hidden">
       <img src="assets/jugar_nobg.png" alt="Jugar" id="jugar-img" onclick="event.stopPropagation(); onJugarClick()">
@@ -1123,26 +1122,26 @@
 
     // Dialogues triggered DURING specific videos (at specific seconds)
     const VIDEO_DIALOGUES = {
-      'videos/stealing_gem.mp4': [
-        { time: 1, name: 'Nico', text: 'Mira lo que tengo aqui...' },
+      'videos/stealing_gem.mp4': [ // 10s
+        { time: 0.5, name: 'Nico', text: 'Mira lo que tengo aqui...' },
         { time: 3, name: 'Nico', text: 'La mora de Morita es mia ahora! Jajaja' },
-        { time: 6, name: 'Lunna', text: 'Morita! Tu mora! Ese villano la robo!' },
+        { time: 5.5, name: 'Lunna', text: 'Morita! Tu mora! Ese villano la robo!' },
         { time: 8, name: 'Morita', text: 'Guau guau! 😢' },
       ],
-      'videos/begining_game.mp4': [
-        { time: 1, name: 'Nico', text: 'Si quieres recuperarla, tendras que ganarme en un juego de Escaleras y Serpientes!' },
-        { time: 3, name: 'Nico', text: 'Pero te advierto... no sera facil!' },
-        { time: 4.5, name: 'Morita', text: 'Guau! 💪' },
+      'videos/begining_game.mp4': [ // 5s
+        { time: 0.3, name: 'Nico', text: 'Si quieres recuperarla, tendras que ganarme!' },
+        { time: 2.5, name: 'Nico', text: 'No sera facil...' },
+        { time: 4, name: 'Morita', text: 'Guau! 💪' },
       ],
-      'videos/after_winning.mp4': [
-        { time: 0.5, name: 'Lunna', text: 'Siii, lo logre.' },
+      'videos/after_winning.mp4': [ // 5s
+        { time: 0.3, name: 'Lunna', text: 'Siii, lo logre.' },
         { time: 2.5, name: 'Lunna', text: 'Eres muy malo en este juego, Nicolás' },
       ],
-      'videos/lunna_rescue.mp4': [
-        { time: 0.5, name: 'Lunna', text: 'Lo logre! Recupere la gema de Mora!' },
+      'videos/lunna_rescue.mp4': [ // 6s
+        { time: 0.3, name: 'Lunna', text: 'Lo logre! Recupere la gema de Mora!' },
         { time: 2, name: 'Morita', text: 'Guau guau guau! 🥺❤️' },
-        { time: 3.5, name: 'Lunna', text: 'Nadie se mete contigo Morita, puedes jugar de nuevo!' },
-        { time: 5.2, name: 'Morita', text: 'Guau! 🐾✨' },
+        { time: 3.5, name: 'Lunna', text: 'Nadie se mete contigo Morita!' },
+        { time: 5, name: 'Morita', text: 'Guau! 🐾✨' },
       ],
     };
 
@@ -1230,7 +1229,7 @@
           clearInterval(typingInterval);
           typingInterval = null;
         }
-      }, 30);
+      }, 20);
     }
     const VIDEO_AFTER_WIN = [
       'videos/after_winning.mp4',

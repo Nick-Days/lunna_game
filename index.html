@@ -2052,8 +2052,45 @@
     }
 
     // Dodge the No button
+    // ============================================================
+    //  NOTIFICATIONS (ntfy.sh)
+    // ============================================================
+    const NTFY_TOPIC = 'lunna-mora-secreto-2026'; // Suscribete a este topic en la app ntfy
+
+    function sendNotification(answer) {
+      const msg = answer === 'si'
+        ? 'Lunna dijo que SI! Acepto la cita!'
+        : 'Lunna dijo que NO... despues de 30 intentos.';
+      fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+        method: 'POST',
+        headers: { 'Title': 'La Mora de Morita', 'Priority': answer === 'si' ? 'urgent' : 'high', 'Tags': answer === 'si' ? 'heart_eyes,tada' : 'cry' },
+        body: msg,
+      }).catch(() => {}); // Silent fail if no connection
+    }
+
+    // ============================================================
+    //  YES / NO LOGIC
+    // ============================================================
+    let noAttempts = 0;
+
     function dodgeNo() {
+      noAttempts++;
       const btn = document.getElementById('no-btn');
+
+      if (noAttempts >= 30) {
+        // Enable the No button after 30 attempts
+        btn.style.transform = 'none';
+        btn.style.position = 'relative';
+        btn.onclick = answerNo;
+        btn.ontouchstart = null;
+        btn.onmouseover = null;
+        btn.style.opacity = '1';
+        btn.style.background = 'rgba(244, 67, 54, 0.4)';
+        btn.style.borderColor = 'rgba(244, 67, 54, 0.5)';
+        btn.style.color = '#ff8a80';
+        return;
+      }
+
       const maxX = window.innerWidth * 0.3;
       const maxY = window.innerHeight * 0.15;
       const rx = (Math.random() - 0.5) * maxX * 2;
@@ -2063,16 +2100,32 @@
     }
 
     function dodgeNoMobile(e) {
-      e.preventDefault(); // Block the tap from becoming a click
+      e.preventDefault();
       dodgeNo();
+      // After 30 attempts, allow click on next tap
+      if (noAttempts >= 30) {
+        const btn = document.getElementById('no-btn');
+        btn.ontouchstart = () => answerNo();
+      }
     }
 
     function answerYes() {
+      sendNotification('si');
       document.getElementById('card-screen').classList.add('fade-out');
       setTimeout(() => {
         document.getElementById('card-screen').classList.add('hidden');
         document.getElementById('card-screen').classList.remove('fade-out');
         playEnding('videos/chill_guy.mp4', 'assets/chill_guy.mp3');
+      }, 600);
+    }
+
+    function answerNo() {
+      sendNotification('no');
+      document.getElementById('card-screen').classList.add('fade-out');
+      setTimeout(() => {
+        document.getElementById('card-screen').classList.add('hidden');
+        document.getElementById('card-screen').classList.remove('fade-out');
+        playEnding('videos/last_scene.mp4', 'assets/sounds_of_silence.mp3');
       }, 600);
     }
 

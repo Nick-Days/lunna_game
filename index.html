@@ -641,6 +641,9 @@
     .end-gallery-item {
       flex: 0 0 280px;
       scroll-snap-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .end-gift-img {
       width: 280px;
@@ -1067,13 +1070,15 @@
     <div class="end-gallery">
       <div class="end-gallery-item">
         <img src="assets/gift.png" alt="Lunna y Morita" class="end-gift-img">
+        <a href="assets/gift.png" download="lunna_y_morita.png" class="download-btn" style="margin-top: 8px; font-size: 0.8rem; padding: 8px 20px;">Descargar</a>
       </div>
       <div class="end-gallery-item">
         <img src="assets/gift_2.png" alt="La Mora de Morita" class="end-gift-img">
+        <a href="assets/gift_2.png" download="la_mora_de_morita.png" class="download-btn" style="margin-top: 8px; font-size: 0.8rem; padding: 8px 20px;">Descargar</a>
       </div>
     </div>
 
-    <a href="#" class="download-btn" style="margin-top: 8px;" onclick="downloadAll(event)">Descargar todas</a>
+    <p class="gallery-hint" style="margin-top: 4px;">En celular: manten presionada la imagen para guardarla</p>
   </div>
 
   <script>
@@ -2897,20 +2902,6 @@
       const map = { stand: 'assets/dog_nobg.png', sit: 'assets/dog_sit_nobg.png', down: 'assets/dog_down_nobg.png' };
       const el = document.getElementById('morita-img-arcade');
       if (el) el.src = map[state] || map.sit;
-    }
-
-    function downloadAll(e) {
-      e.preventDefault();
-      const files = ['assets/gift.png', 'assets/gift_2.png'];
-      const names = ['lunna_y_morita.png', 'la_mora_de_morita.png'];
-      files.forEach((file, i) => {
-        const a = document.createElement('a');
-        a.href = file;
-        a.download = names[i];
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      });
     }
 
     function startArcadeFromInstructions() {

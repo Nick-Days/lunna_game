@@ -1356,7 +1356,7 @@
       waitingForJugar = true;
       const screen = document.getElementById('video-screen');
       screen.classList.remove('hidden');
-      document.getElementById('skip-btn').classList.add('hidden');
+      // skip-btn removed
 
       const video = document.getElementById('video-player');
       video.src = VIDEO_OPENING;
@@ -1434,7 +1434,7 @@
       waitingForJugar = false;
       document.getElementById('jugar-overlay').classList.add('hidden');
       document.getElementById('video-screen').classList.remove('waiting-jugar');
-      document.getElementById('skip-btn').classList.remove('hidden');
+      // skip-btn removed
       // Stop everything from opening
       const video = document.getElementById('video-player');
       video.pause();

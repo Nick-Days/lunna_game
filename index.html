@@ -1974,6 +1974,7 @@
     // ============================================================
     function skipGame() {
       arcadeRunning = false;
+      if (arcadeMusic) { arcadeMusic.pause(); arcadeMusic = null; }
       document.getElementById('game-screen').style.display = 'none';
       document.getElementById('arcade-screen').style.display = 'none';
       document.removeEventListener('keydown', arcadeKeyDown);
@@ -2189,8 +2190,15 @@
       }
     }
 
+    let arcadeMusic = null;
+
     function startArcadeGame() {
       document.getElementById('arcade-screen').style.display = 'block';
+
+      // Start arcade music
+      arcadeMusic = new Audio('assets/arcade_music.mp3');
+      arcadeMusic.loop = true;
+      arcadeMusic.play().catch(() => {});
       arcadeCanvas = document.getElementById('arcade-canvas');
       arcadeCtx = arcadeCanvas.getContext('2d');
 
@@ -2553,6 +2561,9 @@
       arcadePhase = 'won';
       arcadeRunning = false;
       bossActive = false;
+
+      // Stop arcade music
+      if (arcadeMusic) { arcadeMusic.pause(); arcadeMusic = null; }
 
       for (let i = 0; i < 50; i++) {
         particles.push({

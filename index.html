@@ -1,0 +1,2917 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta property="og:title" content="La Mora de Morita">
+  <meta property="og:description" content="Un juego especial para ti">
+  <title>La Mora de Morita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #1a1a3e 0%, #2d1b4e 25%, #4a2068 50%, #2d1b4e 75%, #1a1a3e 100%);
+      background-attachment: fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Nunito', sans-serif;
+      color: #e0e0e0;
+      overflow-x: hidden;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(1.5px 1.5px at 10% 15%, rgba(255,255,255,0.7) 50%, transparent 50%),
+        radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.5) 50%, transparent 50%),
+        radial-gradient(2px 2px at 40% 8%, rgba(199,125,255,0.6) 50%, transparent 50%),
+        radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,0.4) 50%, transparent 50%),
+        radial-gradient(1.5px 1.5px at 70% 20%, rgba(255,255,255,0.6) 50%, transparent 50%),
+        radial-gradient(1px 1px at 85% 55%, rgba(199,125,255,0.5) 50%, transparent 50%),
+        radial-gradient(2px 2px at 15% 65%, rgba(255,255,255,0.3) 50%, transparent 50%),
+        radial-gradient(1px 1px at 35% 80%, rgba(255,255,255,0.5) 50%, transparent 50%),
+        radial-gradient(1.5px 1.5px at 60% 70%, rgba(199,125,255,0.4) 50%, transparent 50%),
+        radial-gradient(1px 1px at 80% 85%, rgba(255,255,255,0.6) 50%, transparent 50%),
+        radial-gradient(2px 2px at 92% 30%, rgba(255,107,157,0.4) 50%, transparent 50%),
+        radial-gradient(1px 1px at 5% 90%, rgba(255,255,255,0.5) 50%, transparent 50%),
+        radial-gradient(1.5px 1.5px at 48% 92%, rgba(199,125,255,0.3) 50%, transparent 50%),
+        radial-gradient(1px 1px at 75% 50%, rgba(255,255,255,0.4) 50%, transparent 50%);
+      z-index: 0;
+      pointer-events: none;
+      animation: twinkle 4s ease-in-out infinite alternate;
+    }
+    @keyframes twinkle {
+      0% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+    body > * { position: relative; z-index: 1; }
+
+    #game-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 500px;
+      padding: 10px;
+    }
+
+    /* ========== OVERLAYS ========== */
+    .fullscreen-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #1a1a3e 0%, #2d1b4e 25%, #4a2068 50%, #2d1b4e 75%, #1a1a3e 100%);
+      z-index: 100;
+      text-align: center;
+      padding: 20px;
+    }
+    .hidden { display: none !important; }
+    .btn-primary {
+      padding: 16px 52px;
+      font-size: 1.3rem;
+      font-family: 'Fredoka One', cursive;
+      background: linear-gradient(180deg, #a855f7 0%, #7b2d8e 50%, #6b21a8 100%);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.3s;
+      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      letter-spacing: 0.5px;
+    }
+    .btn-primary:hover { transform: scale(1.07); box-shadow: 0 6px 25px rgba(168, 85, 247, 0.6), inset 0 1px 0 rgba(255,255,255,0.25); }
+    .btn-primary:active { transform: scale(0.97); box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3); }
+
+    /* ========== VIDEO PLAYER ========== */
+    #video-screen {
+      background: transparent;
+    }
+    #video-screen video {
+      max-width: 100%;
+      max-height: 100vh;
+      width: 100%;
+      height: 100vh;
+      object-fit: contain;
+    }
+    #skip-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 110;
+      padding: 8px 24px;
+      font-size: 1rem;
+      font-family: 'Fredoka One', cursive;
+      background: rgba(168, 85, 247, 0.25);
+      color: rgba(255,255,255,0.8);
+      border: 1px solid rgba(168, 85, 247, 0.5);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.15s;
+      letter-spacing: 0.5px;
+    }
+    #skip-btn:hover { background: rgba(168, 85, 247, 0.5); color: #fff; transform: scale(1.05); }
+
+    /* ========== START BUTTON ========== */
+    #start-btn {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+      cursor: pointer;
+      filter: drop-shadow(0 0 25px rgba(255, 150, 100, 0.5));
+      animation: startPulse 2s ease-in-out infinite;
+      transition: transform 0.2s;
+    }
+    #start-btn:hover { transform: scale(1.12); }
+    @keyframes startPulse {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 150, 100, 0.4)); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 40px rgba(255, 150, 100, 0.8)); transform: scale(1.06); }
+    }
+
+    /* ========== JUGAR OVERLAY ========== */
+    #jugar-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 115;
+      animation: fadeIn 1.5s ease;
+      pointer-events: none;
+    }
+    #jugar-overlay img#jugar-img {
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    #change-music-btn {
+      pointer-events: auto;
+      position: absolute;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 28px;
+      font-size: 0.95rem;
+      font-family: 'Fredoka One', cursive;
+      background: linear-gradient(180deg, #a855f7 0%, #7b2d8e 50%, #6b21a8 100%);
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      cursor: pointer;
+      box-shadow: 0 3px 15px rgba(168, 85, 247, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      white-space: nowrap;
+      transition: transform 0.15s, box-shadow 0.3s;
+      animation: btnPulse 2s ease-in-out infinite;
+    }
+    #change-music-btn:hover { transform: translateX(-50%) scale(1.07); box-shadow: 0 5px 25px rgba(168, 85, 247, 0.6); }
+    @keyframes btnPulse {
+      0%, 100% { box-shadow: 0 3px 15px rgba(168, 85, 247, 0.4), inset 0 1px 0 rgba(255,255,255,0.2); }
+      50% { box-shadow: 0 3px 25px rgba(168, 85, 247, 0.7), inset 0 1px 0 rgba(255,255,255,0.2), 0 0 30px rgba(168, 85, 247, 0.3); }
+    }
+
+    /* Nico laughing popup */
+    #nico-lol-popup {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 120;
+      pointer-events: none;
+      animation: fadeIn 0.3s ease;
+    }
+    #nico-lol-popup img {
+      width: 200px;
+      height: auto;
+      object-fit: contain;
+      animation: nicoLaugh 0.3s ease-in-out 5;
+      filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+    }
+    @keyframes nicoLaugh {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-8deg) scale(1.1); }
+      75% { transform: rotate(8deg) scale(1.1); }
+    }
+    #jugar-overlay img {
+      width: 280px;
+      max-width: 70vw;
+      object-fit: contain;
+      filter: drop-shadow(0 0 30px rgba(255, 200, 100, 0.5));
+      animation: jugarPulse 1.8s ease-in-out infinite;
+      transition: transform 0.2s;
+    }
+    #jugar-overlay img:hover {
+      transform: scale(1.1);
+    }
+    @keyframes jugarPulse {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 200, 100, 0.4)); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 40px rgba(255, 200, 100, 0.8)); transform: scale(1.05); }
+    }
+
+    /* ========== BOARD ========== */
+    canvas#board-canvas {
+      display: block;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 4px 20px rgba(123, 45, 142, 0.4), 0 0 40px rgba(199, 125, 255, 0.15);
+    }
+
+    /* ========== CONTROLS ========== */
+    #game-screen { display: none; }
+    #controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 12px;
+      gap: 10px;
+      width: 100%;
+    }
+    #turn-info {
+      font-size: 1.15rem;
+      color: #d4a5ff;
+      text-align: center;
+      min-height: 1.5em;
+      font-family: 'Fredoka One', cursive;
+      text-shadow: 0 0 15px rgba(199, 125, 255, 0.3);
+      letter-spacing: 0.3px;
+    }
+    #dice-morita-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+      width: 100%;
+    }
+    #dice-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #dice {
+      width: 62px;
+      height: 62px;
+      background: linear-gradient(145deg, #ffffff 0%, #f0e6ff 50%, #e8d5ff 100%);
+      border: 3px solid #9b4dca;
+      border-radius: 12px;
+      display: grid;
+      padding: 9px;
+      box-shadow: 3px 4px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6), 0 0 15px rgba(168, 85, 247, 0.2);
+    }
+    #dice.rolling { animation: diceShake 0.1s infinite; }
+    @keyframes diceShake {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-15deg) scale(1.1); }
+      50% { transform: rotate(10deg) scale(0.95); }
+      75% { transform: rotate(-5deg) scale(1.05); }
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle, #4a2068 0%, #2d1b4e 100%);
+      border-radius: 50%;
+      align-self: center;
+      justify-self: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    /* Dice face layouts */
+    #dice[data-face="1"] { grid-template: 1fr / 1fr; place-items: center; }
+    #dice[data-face="2"] { grid-template: 1fr 1fr / 1fr; }
+    #dice[data-face="2"] .dot:nth-child(1) { justify-self: start; align-self: start; }
+    #dice[data-face="2"] .dot:nth-child(2) { justify-self: end; align-self: end; }
+    #dice[data-face="3"] { grid-template: 1fr 1fr 1fr / 1fr; }
+    #dice[data-face="3"] .dot:nth-child(1) { justify-self: start; align-self: start; }
+    #dice[data-face="3"] .dot:nth-child(2) { justify-self: center; align-self: center; }
+    #dice[data-face="3"] .dot:nth-child(3) { justify-self: end; align-self: end; }
+    #dice[data-face="4"] { grid-template: 1fr 1fr / 1fr 1fr; }
+    #dice[data-face="5"] { grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr; }
+    #dice[data-face="5"] .dot:nth-child(1) { grid-area: 1/1; }
+    #dice[data-face="5"] .dot:nth-child(2) { grid-area: 1/3; }
+    #dice[data-face="5"] .dot:nth-child(3) { grid-area: 2/2; }
+    #dice[data-face="5"] .dot:nth-child(4) { grid-area: 3/1; }
+    #dice[data-face="5"] .dot:nth-child(5) { grid-area: 3/3; }
+    #dice[data-face="6"] { grid-template: 1fr 1fr 1fr / 1fr 1fr; }
+    #roll-btn {
+      padding: 12px 30px;
+      font-size: 1.05rem;
+      font-family: 'Fredoka One', cursive;
+      background: linear-gradient(180deg, #a855f7 0%, #7b2d8e 50%, #6b21a8 100%);
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.3s, opacity 0.3s;
+      box-shadow: 0 3px 12px rgba(168, 85, 247, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      letter-spacing: 0.5px;
+    }
+    #roll-btn:hover { transform: scale(1.07); box-shadow: 0 5px 20px rgba(168, 85, 247, 0.6), inset 0 1px 0 rgba(255,255,255,0.2); }
+    #roll-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ========== MORITA CHEERLEADER ========== */
+    #morita-container {
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+    }
+    #morita-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: opacity 0.3s;
+    }
+
+    /* ========== SCOREBOARD ========== */
+    #scoreboard {
+      width: 100%;
+      max-width: 480px;
+      margin-top: 10px;
+      padding: 12px 16px;
+      background: rgba(45, 27, 78, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 16px;
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      font-size: 0.9rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .player-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+    .player-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+    }
+    .player-name img {
+      width: 52px;
+      height: 52px;
+      border-radius: 0;
+      object-fit: contain;
+      border: none;
+    }
+    #prizes-list {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(199, 125, 255, 0.15);
+      font-size: 0.85rem;
+      color: #d4a5ff;
+      min-height: 1.2em;
+      font-family: 'Fredoka One', cursive;
+      letter-spacing: 0.3px;
+    }
+
+    /* ========== PRIZE POPUP ========== */
+    #prize-popup {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 50;
+    }
+    .popup-content {
+      background: linear-gradient(145deg, #2d1b4e 0%, #1a1a3e 100%);
+      border: 2px solid rgba(199, 125, 255, 0.5);
+      border-radius: 20px;
+      padding: 32px 40px;
+      text-align: center;
+      animation: popIn 0.4s ease;
+      max-width: 320px;
+      box-shadow: 0 8px 40px rgba(168, 85, 247, 0.3), 0 0 60px rgba(199, 125, 255, 0.1), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .popup-content .prize-icon { font-size: 3.5rem; margin-bottom: 12px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
+    .popup-content h2 { color: #d4a5ff; margin-bottom: 10px; font-size: 1.3rem; font-family: 'Fredoka One', cursive; text-shadow: 0 0 20px rgba(199, 125, 255, 0.4); }
+    .popup-content p { color: #e0c3ff; font-size: 1.05rem; line-height: 1.6; }
+    .popup-content button {
+      margin-top: 16px;
+      padding: 11px 32px;
+      font-size: 1rem;
+      font-family: 'Fredoka One', cursive;
+      background: linear-gradient(180deg, #a855f7 0%, #7b2d8e 50%, #6b21a8 100%);
+      color: #fff;
+      border: none;
+      border-radius: 22px;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(168, 85, 247, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      transition: transform 0.15s, box-shadow 0.3s;
+    }
+    .popup-content button:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(168, 85, 247, 0.6), inset 0 1px 0 rgba(255,255,255,0.2); }
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* ========== WIN / FINAL SCREEN ========== */
+    #final-screen {
+      background: #1a1a2e;
+      animation: fadeIn 1.5s ease;
+    }
+    #final-screen h1 {
+      font-size: 2.4rem;
+      color: #e0b0ff;
+      margin-bottom: 0.5rem;
+      font-family: 'Fredoka One', cursive;
+      text-shadow: 0 0 30px rgba(199, 125, 255, 0.5), 0 2px 4px rgba(0,0,0,0.3);
+    }
+    #final-screen p { font-size: 1.1rem; color: #d4a5ff; max-width: 340px; line-height: 1.7; font-weight: 600; }
+    #final-screen .prizes-summary {
+      margin-top: 18px;
+      padding: 16px 24px;
+      background: rgba(45, 27, 78, 0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      text-align: left;
+      font-size: 1rem;
+      font-family: 'Fredoka One', cursive;
+      color: #e0c3ff;
+      line-height: 2;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ========== FADE TRANSITION ========== */
+    .fade-out {
+      animation: fadeOut 0.6s ease forwards;
+    }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    .fade-in {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    /* ========== ANIMATIONS ========== */
+
+    /* ========== CARD PICK GAME ========== */
+    #cards-container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      perspective: 800px;
+    }
+    .card {
+      width: 100px;
+      height: 140px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      animation: cardFloat 2s ease-in-out infinite;
+    }
+    .card:nth-child(2) { animation-delay: 0.3s; }
+    .card:nth-child(3) { animation-delay: 0.6s; }
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .card:hover { transform: scale(1.08) translateY(-4px); }
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease;
+    }
+    .card.flipped .card-inner { transform: rotateY(180deg); }
+    .card.not-picked { opacity: 0.3; pointer-events: none; transform: scale(0.9); }
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-front {
+      background: linear-gradient(145deg, #7b2d8e 0%, #4a2068 100%);
+      border: 2px solid rgba(199, 125, 255, 0.5);
+      font-family: 'Fredoka One', cursive;
+      font-size: 2.5rem;
+      color: rgba(199, 125, 255, 0.6);
+      box-shadow: 0 4px 15px rgba(123, 45, 142, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .card-back {
+      background: linear-gradient(145deg, #ff6b9d 0%, #c77dff 100%);
+      border: 2px solid rgba(255, 107, 157, 0.7);
+      transform: rotateY(180deg);
+      font-size: 2.5rem;
+      box-shadow: 0 4px 20px rgba(255, 107, 157, 0.4);
+    }
+    .card-back::after {
+      content: '⭐';
+      font-size: 2.5rem;
+    }
+    #card-result {
+      animation: fadeIn 0.8s ease;
+    }
+    #yes-no-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 16px;
+      position: relative;
+      min-height: 80px;
+    }
+    #yes-btn {
+      padding: 16px 52px;
+      font-size: 1.4rem;
+      font-family: 'Fredoka One', cursive;
+      background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(74, 222, 128, 0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      transition: transform 0.15s, box-shadow 0.3s;
+      animation: yesPulse 1.5s ease-in-out infinite;
+    }
+    #yes-btn:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(74, 222, 128, 0.6); }
+    @keyframes yesPulse {
+      0%, 100% { box-shadow: 0 4px 20px rgba(74, 222, 128, 0.4), inset 0 1px 0 rgba(255,255,255,0.25); }
+      50% { box-shadow: 0 4px 30px rgba(74, 222, 128, 0.7), inset 0 1px 0 rgba(255,255,255,0.25), 0 0 25px rgba(74, 222, 128, 0.3); }
+    }
+    #no-btn {
+      padding: 6px 16px;
+      font-size: 0.7rem;
+      font-family: 'Fredoka One', cursive;
+      background: rgba(100, 100, 100, 0.3);
+      color: rgba(200, 200, 200, 0.5);
+      border: 1px solid rgba(100, 100, 100, 0.3);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    /* ===== ENDING SCREENS ===== */
+    #ending-screen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+    }
+    #ending-screen video {
+      max-width: 100%;
+      max-height: 100vh;
+      width: 100%;
+      height: 100vh;
+      object-fit: contain;
+    }
+
+    /* ========== ARCADE ========== */
+    #arcade-screen {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 10px;
+    }
+    canvas#arcade-canvas {
+      display: block;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 4px 20px rgba(123, 45, 142, 0.4), 0 0 40px rgba(199, 125, 255, 0.15);
+      background: #05051a;
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    #arcade-hud {
+      background: rgba(45, 27, 78, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 12px;
+      padding: 8px 14px;
+      border: 1px solid rgba(168, 85, 247, 0.2);
+    }
+    #arcade-touch-hint {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.75rem;
+      color: rgba(199,125,255,0.4);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* ========== END GALLERY ========== */
+    .end-gallery {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      align-items: center;
+      width: 100%;
+      max-width: 90vw;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 10px 0 16px;
+    }
+    .end-gallery::-webkit-scrollbar { display: none; }
+    .end-gallery-item {
+      flex: 0 0 280px;
+      scroll-snap-align: center;
+    }
+    .end-gift-img {
+      width: 280px;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(123, 45, 142, 0.4);
+      border: 2px solid rgba(199, 125, 255, 0.3);
+    }
+    .download-btn {
+      display: inline-block;
+      padding: 10px 28px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.95rem;
+      background: linear-gradient(180deg, #a855f7 0%, #7b2d8e 50%, #6b21a8 100%);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 22px;
+      box-shadow: 0 3px 12px rgba(168, 85, 247, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      transition: transform 0.15s, box-shadow 0.3s;
+    }
+    .download-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(168, 85, 247, 0.6);
+    }
+    .gallery-hint {
+      font-size: 0.75rem;
+      color: rgba(199,125,255,0.5);
+      margin-top: -8px;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    /* ========== GEM TRANSITION ========== */
+    #gem-transition {
+      background: linear-gradient(135deg, #1a1a3e 0%, #2d1b4e 25%, #4a2068 50%, #2d1b4e 75%, #1a1a3e 100%);
+    }
+    #gem-transition .gem-reveal {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
+      animation: gemReveal 1.5s ease-out forwards;
+    }
+    @keyframes gemReveal {
+      0% { transform: scale(0) rotate(-30deg); opacity: 0; filter: drop-shadow(0 0 0 rgba(199,125,255,0)); }
+      60% { transform: scale(1.15) rotate(5deg); opacity: 1; filter: drop-shadow(0 0 50px rgba(199,125,255,0.9)); }
+      80% { transform: scale(0.95) rotate(-2deg); }
+      100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 30px rgba(199,125,255,0.6)); }
+    }
+    #gem-transition .gem-text {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.6rem;
+      color: #e0b0ff;
+      text-shadow: 0 0 25px rgba(199,125,255,0.5);
+      margin-top: 20px;
+      opacity: 0;
+      animation: gemTextAppear 0.8s ease 1.2s forwards;
+    }
+    @keyframes gemTextAppear {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #gem-transition .gem-continue {
+      opacity: 0;
+      animation: gemTextAppear 0.6s ease 2s forwards;
+      margin-top: 24px;
+    }
+
+    @keyframes gemPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(199, 125, 255, 0.4)); }
+      50% { transform: scale(1.06); filter: drop-shadow(0 0 30px rgba(199, 125, 255, 0.8)); }
+    }
+
+    /* 1. Morita bounce */
+    #morita-container img {
+      animation: moritaIdle 1.5s ease-in-out infinite;
+    }
+    @keyframes moritaIdle {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-3px) rotate(-2deg); }
+      75% { transform: translateY(-3px) rotate(2deg); }
+    }
+    #morita-container.celebrating img {
+      animation: moritaJump 0.4s ease-in-out 3;
+    }
+    @keyframes moritaJump {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-12px) scale(1.1); }
+    }
+    #morita-container.sad img {
+      animation: moritaSad 0.5s ease-in-out;
+    }
+    @keyframes moritaSad {
+      0% { transform: translateY(0); }
+      30% { transform: translateY(5px) rotate(-5deg); }
+      100% { transform: translateY(0) rotate(0deg); }
+    }
+
+    /* 5. Screen shake */
+    @keyframes screenShake {
+      0%, 100% { transform: translateX(0); }
+      10% { transform: translateX(-4px) translateY(2px); }
+      20% { transform: translateX(4px) translateY(-2px); }
+      30% { transform: translateX(-3px) translateY(1px); }
+      40% { transform: translateX(3px) translateY(-1px); }
+      50% { transform: translateX(-2px); }
+      60% { transform: translateX(2px); }
+      70% { transform: translateX(-1px); }
+    }
+    #game-container.shaking {
+      animation: screenShake 0.5s ease-out;
+    }
+
+    /* ========== DIALOGUE BOX ========== */
+    #dialogue-box {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 130;
+      display: none;
+      padding: 0 16px 20px;
+    }
+    #dialogue-box .dialogue-inner {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(10, 8, 20, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 2px solid rgba(199, 125, 255, 0.35);
+      border-radius: 16px;
+      padding: 16px 20px 14px;
+      position: relative;
+    }
+    #dialogue-box .dialogue-name {
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.85rem;
+      color: #a78bfa;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+    #dialogue-box .dialogue-name.nico { color: #4fc3f7; }
+    #dialogue-box .dialogue-name.lunna { color: #c77dff; }
+    #dialogue-box .dialogue-name.morita { color: #fbbf24; }
+    #dialogue-box .dialogue-text {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.05rem;
+      color: #f0e6ff;
+      line-height: 1.6;
+      min-height: 2em;
+    }
+    #dialogue-box .dialogue-avatar {
+      position: absolute;
+      top: -40px;
+      left: 16px;
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+    }
+    #dialogue-box .dialogue-continue {
+      text-align: right;
+      margin-top: 8px;
+    }
+    #dialogue-box .dialogue-continue span {
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.8rem;
+      color: rgba(199, 125, 255, 0.6);
+      cursor: pointer;
+      animation: continueBlink 1.2s ease-in-out infinite;
+    }
+    @keyframes continueBlink {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* 6. Confetti */
+    #confetti-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 90;
+      overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      top: -10px;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg) scale(0.5); opacity: 0; }
+    }
+
+    /* 7. Dice land bounce */
+    #dice.landed {
+      animation: diceBounce 0.4s ease-out;
+    }
+    @keyframes diceBounce {
+      0% { transform: scale(1.2); }
+      40% { transform: scale(0.9); }
+      60% { transform: scale(1.05); }
+      80% { transform: scale(0.98); }
+      100% { transform: scale(1); }
+    }
+
+    /* 8. Board canvas glow pulse on ladder */
+    canvas#board-canvas.ladder-glow {
+      animation: boardGlow 0.6s ease-out;
+    }
+    @keyframes boardGlow {
+      0% { box-shadow: 0 4px 20px rgba(123, 45, 142, 0.4), 0 0 40px rgba(199, 125, 255, 0.15); }
+      50% { box-shadow: 0 4px 20px rgba(76, 220, 120, 0.5), 0 0 60px rgba(76, 220, 120, 0.3); }
+      100% { box-shadow: 0 4px 20px rgba(123, 45, 142, 0.4), 0 0 40px rgba(199, 125, 255, 0.15); }
+    }
+    canvas#board-canvas.snake-glow {
+      animation: boardSnakeGlow 0.6s ease-out;
+    }
+    @keyframes boardSnakeGlow {
+      0% { box-shadow: 0 4px 20px rgba(123, 45, 142, 0.4), 0 0 40px rgba(199, 125, 255, 0.15); }
+      50% { box-shadow: 0 4px 20px rgba(255, 80, 100, 0.5), 0 0 60px rgba(255, 80, 100, 0.3); }
+      100% { box-shadow: 0 4px 20px rgba(123, 45, 142, 0.4), 0 0 40px rgba(199, 125, 255, 0.15); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== START SCREEN ===== -->
+  <div id="start-screen" class="fullscreen-overlay">
+    <img src="assets/start_nobg.png" alt="Iniciar" id="start-btn" onclick="onStartClick()">
+  </div>
+
+  <div id="confetti-container"></div>
+
+  <!-- ===== DIALOGUE BOX ===== -->
+  <div id="dialogue-box">
+    <div class="dialogue-inner">
+      <img class="dialogue-avatar" id="dialogue-avatar" src="" alt="">
+      <div class="dialogue-name" id="dialogue-name"></div>
+      <div class="dialogue-text" id="dialogue-text"></div>
+      <div class="dialogue-continue" onclick="advanceDialogue()"><span>Continuar ▼</span></div>
+    </div>
+  </div>
+
+  <!-- ===== VIDEO SCREEN ===== -->
+  <div id="video-screen" class="fullscreen-overlay hidden">
+    <video id="video-player" playsinline></video>
+    <button id="skip-btn" onclick="skipVideo()">Saltar ></button>
+    <!-- Jugar button overlay - appears at end of opening.mp4 -->
+    <div id="jugar-overlay" class="hidden">
+      <img src="assets/jugar_nobg.png" alt="Jugar" id="jugar-img" onclick="event.stopPropagation(); onJugarClick()">
+      <button id="change-music-btn" onclick="event.stopPropagation(); changeMusicSurprise()">Cambia de musica, es una sorpresa</button>
+    </div>
+    <!-- Nico laughing popup -->
+    <div id="nico-lol-popup" class="hidden">
+      <img src="assets/me_lol_nobg.png" alt="Nico riendose">
+    </div>
+  </div>
+
+  <!-- ===== GAME SCREEN ===== -->
+  <div id="game-screen">
+    <div id="game-container">
+      <canvas id="board-canvas"></canvas>
+
+      <div id="controls">
+        <div id="turn-info"></div>
+        <div id="dice-morita-row">
+          <div id="morita-container">
+            <img id="morita-img" src="assets/dog_sit_nobg.png" alt="Morita">
+          </div>
+          <div id="dice-area">
+            <div id="dice" data-face="1"><span class="dot"></span></div>
+            <button id="roll-btn" onclick="playTurn()">Tirar dado</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="scoreboard">
+        <div class="player-row">
+          <span class="player-name">
+            <img src="assets/lunna_face_nobg.png" alt="Lunna">
+            Lunna
+          </span>
+          <span id="pos-ella">Casilla: 0</span>
+        </div>
+        <div class="player-row">
+          <span class="player-name">
+            <img src="assets/nico_head_nobg.png" alt="Nico">
+            Nico
+          </span>
+          <span id="pos-nick">Casilla: 0</span>
+        </div>
+        <div id="prizes-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PRIZE POPUP ===== -->
+  <div id="prize-popup">
+    <div class="popup-content">
+      <div class="prize-icon" id="prize-icon"></div>
+      <h2 id="prize-title"></h2>
+      <p id="prize-desc"></p>
+      <button onclick="closePrize()">Continuar</button>
+    </div>
+  </div>
+
+<!-- ===== GAME INSTRUCTIONS ===== -->
+  <div id="instructions-screen" class="fullscreen-overlay hidden" style="overflow-y: auto;">
+    <img src="assets/gem_nobg.png" alt="" style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 12px;">
+    <h2 style="font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: #e0b0ff; text-shadow: 0 0 20px rgba(199,125,255,0.4); margin-bottom: 16px;">Como jugar</h2>
+
+    <div style="max-width: 340px; text-align: left; font-size: 0.95rem; color: #c8b8e0; line-height: 1.8;">
+      <p style="font-family: 'Fredoka One', cursive; color: #d4a5ff; margin-bottom: 6px;">Objetivo</p>
+      <p style="margin-bottom: 14px;">Destruye a los monstruos y derrota a Nico para recuperar la mora de Morita!</p>
+
+      <p style="font-family: 'Fredoka One', cursive; color: #d4a5ff; margin-bottom: 6px;">Controles</p>
+      <p style="margin-bottom: 4px;">📱 <strong>Movil:</strong> Desliza para mover la nave. El disparo es automatico.</p>
+      <p style="margin-bottom: 14px;">💻 <strong>PC:</strong> Flechas ← → para mover. Espacio para disparar.</p>
+
+      <p style="font-family: 'Fredoka One', cursive; color: #4ade80; margin-bottom: 6px;">⭐ Premios</p>
+      <p style="margin-bottom: 14px;">Destruye los enemigos dorados brillantes para ganar premios!</p>
+
+      <p style="font-family: 'Fredoka One', cursive; color: #ff6b9d; margin-bottom: 6px;">💔 Castigos</p>
+      <p style="margin-bottom: 14px;">Si te golpean, pierdes una vida y puedes recibir un castigo. Tienes 5 vidas.</p>
+
+      <p style="font-family: 'Fredoka One', cursive; color: #4fc3f7; margin-bottom: 6px;">🎯 Boss Final</p>
+      <p style="margin-bottom: 14px;">Despues de 10 oleadas, enfrentaras a Nico. Disparale hasta derrotarlo!</p>
+    </div>
+
+    <button class="btn-primary" style="margin-top: 16px; animation: none;" onclick="startArcadeFromInstructions()">Comenzar!</button>
+  </div>
+
+  <!-- ===== ARCADE GAME SCREEN ===== -->
+  <div id="arcade-screen" style="display:none;">
+    <div id="game-container-arcade" style="display:flex; flex-direction:column; align-items:center; width:100%; max-width:500px; padding:10px; margin:0 auto;">
+      <canvas id="arcade-canvas"></canvas>
+      <div id="arcade-hud" style="display:flex; justify-content:space-between; width:100%; max-width:480px; margin-top:8px; font-family:'Fredoka One',cursive; font-size:0.9rem; color:#d4a5ff;">
+        <div id="arcade-lives">Vidas: ★★★★★</div>
+        <div id="arcade-wave">Oleada: 1</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; margin-top:8px;">
+        <div id="morita-container-arcade" style="width:70px; height:70px;">
+          <img id="morita-img-arcade" src="assets/dog_sit_nobg.png" alt="Morita" style="width:100%;height:100%;object-fit:contain;">
+        </div>
+        <div id="arcade-prizes-list" style="font-family:'Fredoka One',cursive; font-size:0.8rem; color:#d4a5ff;"></div>
+      </div>
+      <div id="arcade-touch-hint">Desliza para mover · Disparo automatico</div>
+    </div>
+  </div>
+
+  <!-- ===== GEM TRANSITION ===== -->
+  <div id="gem-transition" class="fullscreen-overlay hidden">
+    <img src="assets/gem_nobg.png" alt="La Mora" class="gem-reveal">
+    <p class="gem-text">Has recuperado la gema!</p>
+    <div class="gem-continue">
+      <button class="btn-primary" style="animation: none;" onclick="onGemContinue()">Continuar</button>
+    </div>
+  </div>
+
+  <!-- ===== WIN SCREEN (before post-game videos) ===== -->
+  <div id="win-screen" class="fullscreen-overlay hidden">
+    <img src="assets/ganaste_nobg.png" alt="Ganaste" style="width: 300px; max-width: 80vw; object-fit: contain; margin-bottom: 16px; filter: drop-shadow(0 0 25px rgba(255, 150, 100, 0.5)); animation: gemPulse 2.5s ease-in-out infinite;">
+    <img src="assets/gem_nobg.png" alt="La Mora" style="width: 130px; height: 130px; margin: 12px 0; object-fit: contain; animation: gemPulse 2s ease-in-out infinite;">
+    <p style="font-size: 1.15rem; color: #d4a5ff; font-family: 'Fredoka One', cursive; margin-bottom: 6px;">Encontraste la mora de Morita!</p>
+    <div class="prizes-summary" id="prizes-summary"></div>
+    <button class="btn-primary" style="margin-top: 20px; animation: none;" onclick="onWinContinue()">Continuar</button>
+  </div>
+
+  <!-- ===== SECRET PRIZE: CARD PICK ===== -->
+  <div id="card-screen" class="fullscreen-overlay hidden">
+    <p style="font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: #e0b0ff; text-shadow: 0 0 20px rgba(199,125,255,0.4); margin-bottom: 8px;">Premio Secreto!</p>
+    <p style="font-size: 0.95rem; color: #c8b8e0; margin-bottom: 24px; max-width: 320px;">Escoge una carta para descubrir tu premio final...</p>
+    <div id="cards-container">
+      <div class="card" onclick="pickCard(this)">
+        <div class="card-inner">
+          <div class="card-front">?</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" onclick="pickCard(this)">
+        <div class="card-inner">
+          <div class="card-front">?</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" onclick="pickCard(this)">
+        <div class="card-inner">
+          <div class="card-front">?</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+    </div>
+    <div id="card-result" class="hidden">
+      <p style="font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: #fbbf24; margin-top: 20px; text-shadow: 0 0 15px rgba(251,191,36,0.4);">Intercambiar todos los premios por...</p>
+      <p style="font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: #e0b0ff; margin-top: 10px; text-shadow: 0 0 20px rgba(199,125,255,0.5);">Una date.</p>
+      <p style="font-size: 0.95rem; color: #c8b8e0; margin-top: 14px; max-width: 340px; line-height: 1.6;">Alguna vez te habian propuesto una cita de una forma tan increible?</p>
+      <p style="font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: #d4a5ff; margin-top: 16px;">Aceptas?</p>
+      <div id="yes-no-container">
+        <button id="yes-btn" onclick="answerYes()">Si</button>
+        <button id="no-btn" onmouseover="dodgeNo()" ontouchstart="dodgeNo()" onclick="answerNo()">No</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ENDING SCREEN ===== -->
+  <div id="ending-screen">
+    <video id="ending-video" playsinline></video>
+  </div>
+
+  <!-- ===== END CARD ===== -->
+  <div id="end-card" class="fullscreen-overlay hidden" style="overflow-y: auto; padding: 30px 20px; gap: 16px;">
+    <img src="assets/gem_nobg.png" alt="" style="width: 80px; height: 80px; object-fit: contain; animation: gemPulse 2.5s ease-in-out infinite;">
+    <p style="font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: #e0b0ff; text-shadow: 0 0 20px rgba(199,125,255,0.5);">Fin</p>
+    <p style="font-size: 1rem; color: #c8b8e0; margin-bottom: 16px;">La Mora de Morita</p>
+
+    <p style="font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: #d4a5ff; margin-bottom: 8px;">Un regalo para ti</p>
+    <p class="gallery-hint">Desliza para ver mas</p>
+
+    <div class="end-gallery">
+      <div class="end-gallery-item">
+        <img src="assets/gift.png" alt="Lunna y Morita" class="end-gift-img">
+      </div>
+      <div class="end-gallery-item">
+        <img src="assets/gift_2.png" alt="La Mora de Morita" class="end-gift-img">
+      </div>
+    </div>
+
+    <a href="#" class="download-btn" style="margin-top: 8px;" onclick="downloadAll(event)">Descargar todas</a>
+  </div>
+
+  <script>
+    // ============================================================
+    //  IMAGE PRELOADING
+    // ============================================================
+    const IMG = {};
+    const imageSources = {
+      nico: 'assets/nico_head_nobg.png',
+      lunna: 'assets/lunna_face_nobg.png',
+      dogStand: 'assets/dog_nobg.png',
+      dogSit: 'assets/dog_sit_nobg.png',
+      dogDown: 'assets/dog_down_nobg.png',
+      gem: 'assets/gem_nobg.png',
+    };
+    let imagesLoaded = 0;
+    const totalImages = Object.keys(imageSources).length;
+
+    for (const [key, src] of Object.entries(imageSources)) {
+      IMG[key] = new Image();
+      IMG[key].onload = () => { imagesLoaded++; };
+      IMG[key].src = src;
+    }
+
+    // ============================================================
+    //  VIDEO SEQUENCE
+    // ============================================================
+    const VIDEO_OPENING = 'videos/opening.mp4';
+    const VIDEO_SEQUENCE_PRE = [
+      'videos/stealing_gem.mp4',
+      'videos/begining_game.mp4',
+    ];
+
+    // ============================================================
+    //  DIALOGUE SYSTEM
+    // ============================================================
+    const CHAR_AVATARS = {
+      'Nico': 'assets/nico_head_nobg.png',
+      'Lunna': 'assets/lunna_face_nobg.png',
+      'Morita': 'assets/dog_head_nobg.png',
+    };
+
+    // Dialogues triggered DURING specific videos (at specific seconds)
+    const VIDEO_DIALOGUES = {
+      'videos/stealing_gem.mp4': [
+        { time: 1, name: 'Nico', text: 'Mira lo que tengo aqui...' },
+        { time: 3, name: 'Nico', text: 'La mora de Morita es mia ahora! Jajaja' },
+        { time: 6, name: 'Lunna', text: 'Morita! Tu mora! Ese villano la robo!' },
+        { time: 8, name: 'Morita', text: 'Guau guau! 😢' },
+      ],
+      'videos/begining_game.mp4': [
+        { time: 1, name: 'Nico', text: 'Si quieres recuperarla, tendras que ganarme en un juego de Escaleras y Serpientes!' },
+        { time: 3, name: 'Nico', text: 'Pero te advierto... no sera facil!' },
+        { time: 4.5, name: 'Morita', text: 'Guau! 💪' },
+      ],
+      'videos/after_winning.mp4': [
+        { time: 0.5, name: 'Lunna', text: 'Siii, lo logre.' },
+        { time: 2.5, name: 'Lunna', text: 'Eres muy malo en este juego, Nicolás' },
+      ],
+      'videos/lunna_rescue.mp4': [
+        { time: 0.5, name: 'Lunna', text: 'Lo logre! Recupere la gema de Mora!' },
+        { time: 2, name: 'Morita', text: 'Guau guau guau! 🥺❤️' },
+        { time: 3.5, name: 'Lunna', text: 'Nadie se mete contigo Morita, puedes jugar de nuevo!' },
+        { time: 5.2, name: 'Morita', text: 'Guau! 🐾✨' },
+      ],
+    };
+
+    let dialogueQueue = [];
+    let dialogueResolve = null;
+    let typingInterval = null;
+    let continueResolve = null;
+
+    function showDialogueSequence(dialogues) {
+      return new Promise((resolve) => {
+        dialogueQueue = [...dialogues];
+        dialogueResolve = resolve;
+        showNextDialogue();
+      });
+    }
+
+    function showNextDialogue() {
+      if (dialogueQueue.length === 0) {
+        document.getElementById('dialogue-box').style.display = 'none';
+        if (dialogueResolve) { const r = dialogueResolve; dialogueResolve = null; r(); }
+        return;
+      }
+
+      const d = dialogueQueue.shift();
+      const box = document.getElementById('dialogue-box');
+      const nameEl = document.getElementById('dialogue-name');
+      const textEl = document.getElementById('dialogue-text');
+      const avatarEl = document.getElementById('dialogue-avatar');
+
+      box.style.display = 'block';
+      nameEl.textContent = d.name;
+      nameEl.className = 'dialogue-name ' + d.name.toLowerCase();
+      avatarEl.src = CHAR_AVATARS[d.name] || '';
+      textEl.textContent = '';
+
+      // Typewriter effect
+      let charIndex = 0;
+      if (typingInterval) clearInterval(typingInterval);
+      typingInterval = setInterval(() => {
+        charIndex++;
+        textEl.textContent = d.text.substring(0, charIndex);
+        if (charIndex >= d.text.length) {
+          clearInterval(typingInterval);
+          typingInterval = null;
+        }
+      }, 35);
+    }
+
+    function advanceDialogue() {
+      if (typingInterval) {
+        clearInterval(typingInterval);
+        typingInterval = null;
+      }
+      // If waiting for continue between videos
+      if (continueResolve) {
+        continueResolve();
+        return;
+      }
+      showNextDialogue();
+    }
+
+    // Show a dialogue during video playback (no pause, auto-typewriter)
+    function showTimedDialogue(d) {
+      const box = document.getElementById('dialogue-box');
+      const nameEl = document.getElementById('dialogue-name');
+      const textEl = document.getElementById('dialogue-text');
+      const avatarEl = document.getElementById('dialogue-avatar');
+      // Hide continue button during timed dialogues
+      box.querySelector('.dialogue-continue').style.display = 'none';
+
+      box.style.display = 'block';
+      nameEl.textContent = d.name;
+      nameEl.className = 'dialogue-name ' + d.name.toLowerCase();
+      avatarEl.src = CHAR_AVATARS[d.name] || '';
+      textEl.textContent = '';
+
+      // Clear previous typing
+      if (typingInterval) clearInterval(typingInterval);
+
+      let charIndex = 0;
+      typingInterval = setInterval(() => {
+        charIndex++;
+        textEl.textContent = d.text.substring(0, charIndex);
+        if (charIndex >= d.text.length) {
+          clearInterval(typingInterval);
+          typingInterval = null;
+        }
+      }, 30);
+    }
+    const VIDEO_AFTER_WIN = [
+      'videos/after_winning.mp4',
+    ];
+    const VIDEO_SEQUENCE_POST_1 = [
+      'videos/lunna_rescue.mp4',
+    ];
+    const VIDEO_SEQUENCE_POST_2 = [
+      'videos/last_scene.mp4',
+    ];
+
+    let currentVideoIndex = 0;
+    let currentVideoList = [];
+    let onVideosComplete = null;
+
+    function playVideoSequence(videoList, onComplete) {
+      currentVideoList = videoList;
+      currentVideoIndex = 0;
+      onVideosComplete = onComplete;
+
+      document.getElementById('video-screen').classList.remove('hidden');
+      playNextVideo();
+    }
+
+    function playNextVideo() {
+      if (currentVideoIndex >= currentVideoList.length) {
+        // All videos done
+        const screen = document.getElementById('video-screen');
+        screen.classList.add('fade-out');
+        setTimeout(() => {
+          screen.classList.add('hidden');
+          screen.classList.remove('fade-out');
+          if (onVideosComplete) onVideosComplete();
+        }, 600);
+        return;
+      }
+
+      // Hide any leftover dialogue from previous video
+      document.getElementById('dialogue-box').style.display = 'none';
+
+      const video = document.getElementById('video-player');
+      video.src = currentVideoList[currentVideoIndex];
+      video.muted = false;
+      video.load();
+      video.play().catch(() => {
+        // Autoplay blocked - click on video to play
+        const handler = () => {
+          video.play();
+          video.removeEventListener('click', handler);
+        };
+        video.addEventListener('click', handler);
+      });
+
+      // Setup timed dialogues if this video has them
+      const videoSrc = currentVideoList[currentVideoIndex];
+      const dialogues = VIDEO_DIALOGUES[videoSrc];
+      let shownDialogueIndices = new Set();
+
+      if (dialogues) {
+        video.ontimeupdate = () => {
+          for (let i = 0; i < dialogues.length; i++) {
+            if (!shownDialogueIndices.has(i) && video.currentTime >= dialogues[i].time) {
+              shownDialogueIndices.add(i);
+              showTimedDialogue(dialogues[i]);
+            }
+          }
+        };
+      } else {
+        video.ontimeupdate = null;
+      }
+
+      video.onended = () => {
+        video.ontimeupdate = null;
+        if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+
+        if (dialogues && dialogues.length > 0) {
+          // Video had dialogues - keep last one visible with Continuar
+          const box = document.getElementById('dialogue-box');
+          const continueBtn = box.querySelector('.dialogue-continue');
+          box.style.display = 'block';
+          continueBtn.style.display = 'block';
+
+          continueResolve = () => {
+            box.style.display = 'none';
+            continueBtn.style.display = '';
+            continueResolve = null;
+            currentVideoIndex++;
+            playNextVideo();
+          };
+        } else {
+          // No dialogues - advance immediately
+          document.getElementById('dialogue-box').style.display = 'none';
+          currentVideoIndex++;
+          playNextVideo();
+        }
+      };
+    }
+
+    let waitingForJugar = false;
+
+    function skipVideo() {
+      if (waitingForJugar) return; // Block skip during opening
+      const video = document.getElementById('video-player');
+      video.pause();
+      currentVideoIndex++;
+      playNextVideo();
+    }
+
+    // ============================================================
+    //  EXPERIENCE FLOW
+    // ============================================================
+    function onStartClick() {
+      const screen = document.getElementById('start-screen');
+      screen.classList.add('fade-out');
+      setTimeout(() => {
+        screen.classList.add('hidden');
+        screen.classList.remove('fade-out');
+        beginExperience();
+      }, 600);
+    }
+
+    function beginExperience() {
+      // Play opening video, then show Jugar button overlay
+      waitingForJugar = true;
+      const screen = document.getElementById('video-screen');
+      screen.classList.remove('hidden');
+      document.getElementById('skip-btn').classList.add('hidden');
+
+      const video = document.getElementById('video-player');
+      video.src = VIDEO_OPENING;
+      video.load();
+      video.play().catch(() => {
+        const handler = () => { video.play(); video.removeEventListener('click', handler); };
+        video.addEventListener('click', handler);
+      });
+
+      // Show Jugar a few seconds before video ends, keep music looping
+      let shownJugar = false;
+      let openingAudio = null;
+
+      video.ontimeupdate = () => {
+        // Show Jugar button 3 seconds before the video ends
+        if (!shownJugar && video.duration && video.currentTime >= video.duration - 3) {
+          shownJugar = true;
+          document.getElementById('jugar-overlay').classList.remove('hidden');
+          document.getElementById('video-screen').classList.add('waiting-jugar');
+        }
+      };
+
+      video.onended = () => {
+        // Video ended - extract audio and loop it, freeze last frame
+        if (!openingAudio) {
+          openingAudio = new Audio(VIDEO_OPENING);
+          openingAudio.loop = true;
+          openingAudio.play().catch(() => {});
+          openingAudioRef = openingAudio;
+        }
+        // Keep last frame visible (video stays paused at end)
+      };
+    }
+
+    let openingAudioRef = null;
+    let guarachaAudio = null;
+
+    let isGuarachaPlaying = false;
+
+    function changeMusicSurprise() {
+      const video = document.getElementById('video-player');
+      const popup = document.getElementById('nico-lol-popup');
+
+      // Show Nico laughing
+      popup.classList.remove('hidden');
+      setTimeout(() => { popup.classList.add('hidden'); }, 2000);
+
+      if (!isGuarachaPlaying) {
+        // Switch to guaracha
+        // Stop opening music
+        if (openingAudioRef) { openingAudioRef.pause(); openingAudioRef = null; }
+        video.muted = true;
+        // Play guaracha
+        if (!guarachaAudio) {
+          guarachaAudio = new Audio('assets/guaracha.mp3');
+          guarachaAudio.loop = true;
+        }
+        guarachaAudio.play().catch(() => {});
+        isGuarachaPlaying = true;
+      } else {
+        // Switch back to opening music
+        guarachaAudio.pause();
+        video.muted = false;
+        // Restart opening audio loop if video already ended
+        if (video.ended || video.paused) {
+          openingAudioRef = new Audio(VIDEO_OPENING);
+          openingAudioRef.loop = true;
+          openingAudioRef.play().catch(() => {});
+        }
+        isGuarachaPlaying = false;
+      }
+    }
+
+    function onJugarClick() {
+      waitingForJugar = false;
+      document.getElementById('jugar-overlay').classList.add('hidden');
+      document.getElementById('video-screen').classList.remove('waiting-jugar');
+      document.getElementById('skip-btn').classList.remove('hidden');
+      // Stop everything from opening
+      const video = document.getElementById('video-player');
+      video.pause();
+      video.muted = false; // Ensure next videos play their own audio
+      video.onended = null;
+      video.ontimeupdate = null;
+      // Stop looping audio if playing
+      if (openingAudioRef) {
+        openingAudioRef.pause();
+        openingAudioRef = null;
+      }
+      if (guarachaAudio) {
+        guarachaAudio.pause();
+        guarachaAudio = null;
+      }
+      isGuarachaPlaying = false;
+      document.getElementById('nico-lol-popup').classList.add('hidden');
+      // Continue with rest of pre-game videos, then start game
+      playVideoSequence(VIDEO_SEQUENCE_PRE, startGame);
+    }
+
+    // ============================================================
+    //  SCRIPTED GAME SEQUENCE
+    // ============================================================
+    const SCRIPTED_ROLLS = [
+      4, // T1  Ella: 0→4
+      6, // T2  Nico: 0→6
+      3, // T3  Ella: 4→7 → ladder → 26 (PRIZE: malteada)
+      6, // T4  Nico: 6→12 → ladder → 45
+      5, // T5  Ella: 26→31 (PRIZE: hamburguesa)
+      6, // T6  Nico: 45→51
+      6, // T7  Ella: 31→37 → snake → 14 (DRAMA!)
+      5, // T8  Nico: 51→56
+      6, // T9  Ella: 14→20 → ladder → 52 (PRIZE: helado)
+      5, // T10 Nico: 56→61
+      3, // T11 Ella: 52→55 (PRIZE: salchipapa)
+      6, // T12 Nico: 61→67
+      5, // T13 Ella: 55→60 → ladder → 82 (PRIZE: helado papitas)
+      5, // T14 Nico: 67→72
+      6, // T15 Ella: 82→88 → ladder → 100 (WINS!)
+    ];
+
+    const LADDERS = {
+      7: 26, 12: 45, 20: 52, 60: 82, 88: 100,
+      3: 22, 34: 57, 46: 75, 79: 93,
+    };
+    const SNAKES = {
+      37: 14,
+      43: 18, 54: 34, 64: 40, 85: 59, 91: 71, 99: 62,
+    };
+    const PRIZES = {
+      26: { icon: '🥤', title: '+1 Malteada!', desc: 'Ganaste una malteada!', tag: '+1 malteada' },
+      31: { icon: '🍔', title: '-1 Hamburguesa!', desc: 'Me debes una hamburguesa!', tag: '-1 hamburguesa' },
+      52: { icon: '🍦', title: '+1 Helado!', desc: 'Ganaste un helado!', tag: '+1 helado' },
+      55: { icon: '🍟', title: '+1 Salchipapa!', desc: 'Ganaste una salchipapa!', tag: '+1 salchipapa' },
+      82: { icon: '🍦🍟', title: '-1 Helado con papitas!', desc: 'Me debes un helado con papitas del McDonalds!', tag: '-1 helado con papitas' },
+    };
+
+    // ============================================================
+    //  GAME STATE
+    // ============================================================
+    let currentTurn = 0;
+    let ellaPos = 0;
+    let nickPos = 0;
+    let isAnimating = false;
+    let collectedPrizes = [];
+    let pendingPrize = null;
+
+    let canvas, ctx;
+    let boardSize, cellSize;
+
+    // ============================================================
+    //  MORITA CHEERLEADER
+    // ============================================================
+    let moritaState = 'sit'; // 'stand', 'sit', 'down'
+
+    function setMorita(state) {
+      moritaState = state;
+      const img = document.getElementById('morita-img');
+      const map = { stand: 'assets/dog_nobg.png', sit: 'assets/dog_sit_nobg.png', down: 'assets/dog_down_nobg.png' };
+      img.src = map[state] || map.sit;
+    }
+
+    // ============================================================
+    //  BOARD RENDERING
+    // ============================================================
+    function squareToGrid(square) {
+      if (square <= 0) return { col: 0, row: 9 };
+      const s = square - 1;
+      const row = Math.floor(s / 10);
+      const col = row % 2 === 0 ? (s % 10) : (9 - s % 10);
+      return { col, row: 9 - row };
+    }
+
+    function gridToPixel(col, row) {
+      return { x: col * cellSize + cellSize / 2, y: row * cellSize + cellSize / 2 };
+    }
+
+    function initCanvas() {
+      canvas = document.getElementById('board-canvas');
+      ctx = canvas.getContext('2d');
+      resizeBoard();
+      window.addEventListener('resize', () => { resizeBoard(); drawBoard(); });
+    }
+
+    function resizeBoard() {
+      const dpr = window.devicePixelRatio || 1;
+      const maxW = Math.min(window.innerWidth - 20, 480);
+      boardSize = maxW;
+      cellSize = boardSize / 10;
+      canvas.width = boardSize * dpr;
+      canvas.height = boardSize * dpr;
+      canvas.style.width = boardSize + 'px';
+      canvas.style.height = boardSize + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function drawBoard() {
+      // Board background with rounded corners
+      ctx.clearRect(0, 0, boardSize, boardSize);
+      ctx.save();
+      const br = 10;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, boardSize, boardSize, br);
+      ctx.clip();
+
+      // Draw cells
+      for (let sq = 1; sq <= 100; sq++) {
+        const { col, row } = squareToGrid(sq);
+        const x = col * cellSize;
+        const y = row * cellSize;
+        const gap = 1;
+
+        const isLight = (col + row) % 2 === 0;
+        ctx.fillStyle = isLight ? '#3d2466' : '#2a1650';
+
+        if (PRIZES[sq]) ctx.fillStyle = isLight ? '#4a2878' : '#3b1f65';
+        if (LADDERS[sq]) ctx.fillStyle = isLight ? '#1e4a3a' : '#163d2e';
+        if (SNAKES[sq]) ctx.fillStyle = isLight ? '#4a1e2e' : '#3d1625';
+
+        ctx.beginPath();
+        ctx.roundRect(x + gap, y + gap, cellSize - gap * 2, cellSize - gap * 2, 3);
+        ctx.fill();
+
+        // Number
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = `bold ${Math.max(9, cellSize * 0.22)}px Nunito`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText(sq, x + 3, y + 2);
+      }
+
+      // Highlight square 100 with glow
+      const sq100 = squareToGrid(100);
+      const px100c = gridToPixel(sq100.col, sq100.row);
+      const glowGrad = ctx.createRadialGradient(px100c.x, px100c.y, 0, px100c.x, px100c.y, cellSize);
+      glowGrad.addColorStop(0, 'rgba(199, 125, 255, 0.25)');
+      glowGrad.addColorStop(1, 'rgba(199, 125, 255, 0)');
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(sq100.col * cellSize - cellSize * 0.5, sq100.row * cellSize - cellSize * 0.5, cellSize * 2, cellSize * 2);
+
+      // Draw ladders
+      ctx.lineWidth = Math.max(2, cellSize * 0.07);
+      for (const [from, to] of Object.entries(LADDERS)) {
+        const f = squareToGrid(+from);
+        const t = squareToGrid(+to);
+        const fp = gridToPixel(f.col, f.row);
+        const tp = gridToPixel(t.col, t.row);
+        ctx.strokeStyle = 'rgba(76, 220, 120, 0.55)';
+        ctx.beginPath();
+        const dx = tp.x - fp.x;
+        const dy = tp.y - fp.y;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        const nx = -dy / len * cellSize * 0.15;
+        const ny = dx / len * cellSize * 0.15;
+        ctx.moveTo(fp.x + nx, fp.y + ny);
+        ctx.lineTo(tp.x + nx, tp.y + ny);
+        ctx.moveTo(fp.x - nx, fp.y - ny);
+        ctx.lineTo(tp.x - nx, tp.y - ny);
+        const steps = Math.max(3, Math.floor(len / (cellSize * 0.6)));
+        for (let i = 1; i < steps; i++) {
+          const t2 = i / steps;
+          const mx = fp.x + dx * t2;
+          const my = fp.y + dy * t2;
+          ctx.moveTo(mx + nx, my + ny);
+          ctx.lineTo(mx - nx, my - ny);
+        }
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(76, 220, 120, 0.7)';
+        ctx.font = `bold ${cellSize * 0.3}px Nunito`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('↑', fp.x, fp.y);
+      }
+
+      // Draw snakes
+      for (const [from, to] of Object.entries(SNAKES)) {
+        const f = squareToGrid(+from);
+        const t = squareToGrid(+to);
+        const fp = gridToPixel(f.col, f.row);
+        const tp = gridToPixel(t.col, t.row);
+        ctx.strokeStyle = 'rgba(255, 80, 100, 0.55)';
+        ctx.lineWidth = Math.max(3, cellSize * 0.09);
+        ctx.setLineDash([cellSize * 0.12, cellSize * 0.08]);
+        ctx.beginPath();
+        const dx = tp.x - fp.x;
+        const dy = tp.y - fp.y;
+        const cp1x = fp.x + dx * 0.25 + cellSize * 0.5;
+        const cp1y = fp.y + dy * 0.25 - cellSize * 0.3;
+        const cp2x = fp.x + dx * 0.75 - cellSize * 0.5;
+        const cp2y = fp.y + dy * 0.75 + cellSize * 0.3;
+        ctx.moveTo(fp.x, fp.y);
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, tp.x, tp.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(255, 80, 100, 0.7)';
+        ctx.font = `bold ${cellSize * 0.3}px Nunito`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('↓', fp.x, fp.y);
+      }
+
+      // Draw prize icons
+      for (const [sq, prize] of Object.entries(PRIZES)) {
+        const g = squareToGrid(+sq);
+        const p = gridToPixel(g.col, g.row);
+        ctx.font = `${cellSize * 0.35}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(prize.icon, p.x, p.y + cellSize * 0.15);
+      }
+
+      // Gem at 100
+      const px100 = gridToPixel(sq100.col, sq100.row);
+      if (IMG.gem && IMG.gem.complete && IMG.gem.naturalWidth > 0) {
+        const gemSize = cellSize * 1.3;
+        ctx.drawImage(IMG.gem, px100.x - gemSize / 2, px100.y - gemSize / 2, gemSize, gemSize);
+      } else {
+        drawMoraSmall(px100.x, px100.y, cellSize * 0.2);
+      }
+
+      // Draw player tokens
+      ctx.restore(); // close board clip
+
+      // Draw players outside clip so they can overflow
+      drawPlayerToken(ellaPos, IMG.lunna, '#c77dff', -cellSize * 0.14);
+      drawPlayerToken(nickPos, IMG.nico, '#4fc3f7', cellSize * 0.14);
+    }
+
+    function drawMoraSmall(cx, cy, r) {
+      ctx.fillStyle = '#ff6b9d';
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+      const bumpR = r * 0.4;
+      const bumpDist = r * 0.65;
+      for (let i = 0; i < 6; i++) {
+        const angle = (i / 6) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(angle) * bumpDist, cy + Math.sin(angle) * bumpDist, bumpR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = '#4ade80';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy - r - bumpR * 0.2, r * 0.45, r * 0.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawPlayerToken(pos, img, borderColor, offsetX) {
+      if (pos <= 0) return;
+      const g = squareToGrid(pos);
+      const p = gridToPixel(g.col, g.row);
+      const cx = p.x + offsetX;
+      const cy = p.y;
+
+      if (img && img.complete && img.naturalWidth > 0) {
+        const imgAspect = img.naturalWidth / img.naturalHeight;
+        const size = cellSize * 1.2;
+        let drawW, drawH;
+        if (imgAspect > 1) {
+          drawW = size;
+          drawH = size / imgAspect;
+        } else {
+          drawH = size;
+          drawW = size * imgAspect;
+        }
+        ctx.drawImage(img, cx - drawW / 2, cy - drawH / 2, drawW, drawH);
+      } else {
+        // Fallback dot
+        ctx.fillStyle = borderColor;
+        ctx.beginPath();
+        ctx.arc(cx, cy, cellSize * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // ============================================================
+    //  DICE ANIMATION
+    // ============================================================
+    function setDiceFace(value) {
+      const dice = document.getElementById('dice');
+      dice.setAttribute('data-face', value);
+      dice.innerHTML = '';
+      for (let i = 0; i < value; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        dice.appendChild(dot);
+      }
+    }
+
+    function animateDice(targetValue) {
+      return new Promise((resolve) => {
+        const dice = document.getElementById('dice');
+        dice.classList.add('rolling');
+        dice.classList.remove('landed');
+        let count = 0;
+        const interval = setInterval(() => {
+          setDiceFace(Math.floor(Math.random() * 6) + 1);
+          count++;
+          if (count >= 15) {
+            clearInterval(interval);
+            dice.classList.remove('rolling');
+            dice.classList.add('landed');
+            setDiceFace(targetValue);
+            setTimeout(resolve, 400);
+          }
+        }, 70);
+      });
+    }
+
+    // ============================================================
+    //  SCREEN SHAKE
+    // ============================================================
+    function triggerShake() {
+      const container = document.getElementById('game-container');
+      container.classList.remove('shaking');
+      void container.offsetWidth;
+      container.classList.add('shaking');
+      setTimeout(() => container.classList.remove('shaking'), 500);
+    }
+
+    // ============================================================
+    //  BOARD GLOW EFFECTS
+    // ============================================================
+    function triggerBoardGlow(type) {
+      const c = document.getElementById('board-canvas');
+      c.classList.remove('ladder-glow', 'snake-glow');
+      void c.offsetWidth;
+      c.classList.add(type === 'ladder' ? 'ladder-glow' : 'snake-glow');
+      setTimeout(() => c.classList.remove('ladder-glow', 'snake-glow'), 600);
+    }
+
+    // ============================================================
+    //  MORITA REACTIONS
+    // ============================================================
+    function moritaCelebrate() {
+      const mc = document.getElementById('morita-container');
+      mc.classList.remove('celebrating', 'sad');
+      void mc.offsetWidth;
+      mc.classList.add('celebrating');
+      setTimeout(() => mc.classList.remove('celebrating'), 1200);
+    }
+
+    function moritaSad() {
+      const mc = document.getElementById('morita-container');
+      mc.classList.remove('celebrating', 'sad');
+      void mc.offsetWidth;
+      mc.classList.add('sad');
+      setTimeout(() => mc.classList.remove('sad'), 500);
+    }
+
+    // ============================================================
+    //  CONFETTI
+    // ============================================================
+    function launchConfetti(count = 50) {
+      const container = document.getElementById('confetti-container');
+      const colors = ['#c77dff', '#ff6b9d', '#4ade80', '#fbbf24', '#60a5fa', '#f472b6', '#a78bfa'];
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.width = (6 + Math.random() * 8) + 'px';
+        piece.style.height = (6 + Math.random() * 8) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+        piece.style.animationDelay = (Math.random() * 1.5) + 's';
+        container.appendChild(piece);
+      }
+      setTimeout(() => { container.innerHTML = ''; }, 5000);
+    }
+
+    // ============================================================
+    //  PIECE MOVEMENT
+    // ============================================================
+    function animateMove(fromPos, toPos, isElla) {
+      return new Promise((resolve) => {
+        const steps = toPos - fromPos;
+        let currentStep = 0;
+        const interval = setInterval(() => {
+          currentStep++;
+          if (isElla) { ellaPos = fromPos + currentStep; }
+          else { nickPos = fromPos + currentStep; }
+          drawBoard();
+          if (currentStep >= steps) {
+            clearInterval(interval);
+            setTimeout(resolve, 200);
+          }
+        }, 180);
+      });
+    }
+
+    function animateSlide(toPos, isElla) {
+      return new Promise((resolve) => {
+        if (isElla) { ellaPos = toPos; }
+        else { nickPos = toPos; }
+        drawBoard();
+        setTimeout(resolve, 600);
+      });
+    }
+
+    // ============================================================
+    //  PRIZE HANDLING
+    // ============================================================
+    function showPrize(prize) {
+      return new Promise((resolve) => {
+        document.getElementById('prize-icon').textContent = prize.icon;
+        document.getElementById('prize-title').textContent = prize.title;
+        document.getElementById('prize-desc').textContent = prize.desc;
+        document.getElementById('prize-popup').style.display = 'flex';
+        pendingPrize = resolve;
+      });
+    }
+
+    function closePrize() {
+      document.getElementById('prize-popup').style.display = 'none';
+      if (pendingPrize) { const r = pendingPrize; pendingPrize = null; r(); }
+    }
+
+    function updatePrizesDisplay() {
+      const el = document.getElementById('prizes-list');
+      if (collectedPrizes.length === 0) { el.textContent = ''; return; }
+      el.textContent = 'Premios: ' + collectedPrizes.map(p => p.tag).join(', ');
+    }
+
+    // ============================================================
+    //  TURN LOGIC
+    // ============================================================
+    function isEllaTurn() { return currentTurn % 2 === 0; }
+
+    function updateTurnInfo() {
+      const info = document.getElementById('turn-info');
+      if (currentTurn >= SCRIPTED_ROLLS.length) return;
+      if (isEllaTurn()) {
+        info.innerHTML = '<span style="color:#c77dff">Turno de Lunna</span> — Tira el dado';
+        setMorita('stand');
+      } else {
+        info.innerHTML = '<span style="color:#4fc3f7">Turno de Nico</span> — Tira el dado';
+        setMorita('sit');
+      }
+      document.getElementById('roll-btn').disabled = false;
+    }
+
+    function updateScoreboard() {
+      document.getElementById('pos-ella').textContent = `Casilla: ${ellaPos}`;
+      document.getElementById('pos-nick').textContent = `Casilla: ${nickPos}`;
+      updatePrizesDisplay();
+    }
+
+    async function playTurn() {
+      if (isAnimating || currentTurn >= SCRIPTED_ROLLS.length) return;
+      isAnimating = true;
+      document.getElementById('roll-btn').disabled = true;
+
+      const diceValue = SCRIPTED_ROLLS[currentTurn];
+      const isElla = isEllaTurn();
+
+      await animateDice(diceValue);
+
+      const currentPos = isElla ? ellaPos : nickPos;
+      const newPos = Math.min(currentPos + diceValue, 100);
+
+      if (newPos > currentPos) {
+        await animateMove(currentPos, newPos, isElla);
+      }
+
+      // Check ladder or snake
+      let finalPos = newPos;
+      if (LADDERS[newPos]) {
+        finalPos = LADDERS[newPos];
+        document.getElementById('turn-info').innerHTML = isElla
+          ? '<span style="color:#4ade80">Escalera! Lunna sube!</span>'
+          : '<span style="color:#4ade80">Nico sube por una escalera!</span>';
+        triggerBoardGlow('ladder');
+        if (isElla) { setMorita('stand'); moritaCelebrate(); }
+        await new Promise(r => setTimeout(r, 500));
+        await animateSlide(finalPos, isElla);
+      } else if (SNAKES[newPos]) {
+        finalPos = SNAKES[newPos];
+        document.getElementById('turn-info').innerHTML = isElla
+          ? '<span style="color:#f44336">Serpiente! Lunna baja!</span>'
+          : '<span style="color:#f44336">Nico cae en una serpiente!</span>';
+        triggerShake();
+        triggerBoardGlow('snake');
+        if (isElla) { setMorita('down'); moritaSad(); }
+        await new Promise(r => setTimeout(r, 500));
+        await animateSlide(finalPos, isElla);
+      }
+
+      if (isElla) { ellaPos = finalPos; }
+      else { nickPos = finalPos; }
+      drawBoard();
+      updateScoreboard();
+
+      // Check prize (confetti + morita celebrate)
+      if (isElla && PRIZES[finalPos]) {
+        moritaCelebrate();
+        launchConfetti(30);
+        const prize = PRIZES[finalPos];
+        collectedPrizes.push(prize);
+        updatePrizesDisplay();
+        await showPrize(prize);
+      }
+
+      // Check win
+      if (isElla && finalPos >= 100) {
+        launchConfetti(80);
+        moritaCelebrate();
+        await new Promise(r => setTimeout(r, 1500));
+        triggerPostGame();
+        return;
+      }
+
+      currentTurn++;
+      isAnimating = false;
+      updateTurnInfo();
+    }
+
+    // ============================================================
+    //  POST-GAME: VIDEOS + FINAL SCREEN
+    // ============================================================
+    function skipGame() {
+      arcadeRunning = false;
+      document.getElementById('game-screen').style.display = 'none';
+      document.getElementById('arcade-screen').style.display = 'none';
+      document.removeEventListener('keydown', arcadeKeyDown);
+      document.removeEventListener('keyup', arcadeKeyUp);
+      triggerPostGame();
+    }
+
+    function triggerPostGame() {
+      // Hide game, play after_winning animation first
+      document.getElementById('game-screen').style.display = 'none';
+      document.getElementById('arcade-screen').style.display = 'none';
+      playVideoSequence(VIDEO_AFTER_WIN, showGemTransition);
+    }
+
+    function showGemTransition() {
+      document.getElementById('video-screen').classList.add('hidden');
+      document.getElementById('gem-transition').classList.remove('hidden');
+      launchConfetti(60);
+    }
+
+    function onGemContinue() {
+      document.getElementById('gem-transition').classList.add('fade-out');
+      setTimeout(() => {
+        document.getElementById('gem-transition').classList.add('hidden');
+        document.getElementById('gem-transition').classList.remove('fade-out');
+        // Play lunna_rescue
+        playVideoSequence(VIDEO_SEQUENCE_POST_1, showWinScreen);
+      }, 600);
+    }
+
+    function showWinScreen() {
+      // After lunna_rescue, show win screen with prizes
+      document.getElementById('video-screen').classList.add('hidden');
+
+      const summaryEl = document.getElementById('prizes-summary');
+      if (collectedPrizes.length > 0) {
+        summaryEl.innerHTML = '<strong>Tu balance:</strong><br>' +
+          collectedPrizes.map(p => `${p.icon} ${p.tag}`).join('<br>');
+      }
+
+      document.getElementById('win-screen').classList.remove('hidden');
+      launchConfetti(80);
+    }
+
+    function onWinContinue() {
+      document.getElementById('win-screen').classList.add('fade-out');
+      setTimeout(() => {
+        document.getElementById('win-screen').classList.add('hidden');
+        document.getElementById('win-screen').classList.remove('fade-out');
+        // Show card pick game
+        document.getElementById('card-screen').classList.remove('hidden');
+      }, 600);
+    }
+
+    function pickCard(card) {
+      // Disable all cards
+      document.querySelectorAll('.card').forEach(c => {
+        if (c !== card) c.classList.add('not-picked');
+      });
+      // Flip selected card
+      card.classList.add('flipped');
+      card.style.cursor = 'default';
+      card.onclick = null;
+
+      // Show result after flip animation
+      setTimeout(() => {
+        document.getElementById('card-result').classList.remove('hidden');
+        launchConfetti(60);
+      }, 800);
+    }
+
+    // Dodge the No button
+    function dodgeNo() {
+      const btn = document.getElementById('no-btn');
+      const maxX = window.innerWidth * 0.3;
+      const maxY = window.innerHeight * 0.2;
+      const rx = (Math.random() - 0.5) * maxX * 2;
+      const ry = (Math.random() - 0.5) * maxY * 2;
+      btn.style.position = 'relative';
+      btn.style.transform = `translate(${rx}px, ${ry}px)`;
+    }
+
+    function answerNo() {
+      document.getElementById('card-screen').classList.add('fade-out');
+      setTimeout(() => {
+        document.getElementById('card-screen').classList.add('hidden');
+        document.getElementById('card-screen').classList.remove('fade-out');
+        playEnding('videos/last_scene.mp4', 'assets/sounds_of_silence.mp3');
+      }, 600);
+    }
+
+    function answerYes() {
+      document.getElementById('card-screen').classList.add('fade-out');
+      setTimeout(() => {
+        document.getElementById('card-screen').classList.add('hidden');
+        document.getElementById('card-screen').classList.remove('fade-out');
+        playEnding('videos/chill_guy.mp4', 'assets/chill_guy.mp3');
+      }, 600);
+    }
+
+    function playEnding(videoSrc, audioSrc) {
+      const screen = document.getElementById('ending-screen');
+      const video = document.getElementById('ending-video');
+      screen.style.display = 'flex';
+      video.src = videoSrc;
+      video.muted = true;
+      video.loop = true;
+      video.load();
+      video.play().catch(() => {});
+
+      const audio = new Audio(audioSrc);
+      audio.loop = false;
+      audio.play().catch(() => {});
+
+      // End after 10 seconds
+      setTimeout(() => {
+        video.pause();
+        audio.pause();
+        screen.style.display = 'none';
+        // Show end card
+        document.getElementById('end-card').classList.remove('hidden');
+      }, 10000);
+    }
+
+    function showFinalScreen() {
+      // Done
+    }
+
+    // Remove post-2 from normal flow since endings are handled by yes/no
+
+
+    // ============================================================
+    //  START GAME
+    // ============================================================
+    function startGame() {
+      collectedPrizes = [];
+      document.getElementById('instructions-screen').classList.remove('hidden');
+    }
+
+    function startBoardGame() {
+      currentTurn = 0;
+      ellaPos = 0;
+      nickPos = 0;
+      isAnimating = false;
+
+      document.getElementById('game-screen').style.display = 'block';
+      initCanvas();
+      drawBoard();
+      updateScoreboard();
+      updateTurnInfo();
+      setMorita('stand');
+    }
+
+    // ============================================================
+    //  ARCADE GAME - IMPROVED
+    // ============================================================
+    let arcadeCanvas, arcadeCtx, arcadeW, arcadeH;
+    let arcadeRunning = false;
+    let ship = { x: 0, y: 0, w: 60, h: 48, speed: 4.5, lastShot: 0, invincible: 0, trail: [] };
+    let bullets = [];
+    let enemies = [];
+    let enemyBullets = [];
+    let particles = [];
+    let drops = [];
+    let stars = []; // parallax stars
+    let arcadeLives = 5;
+    let arcadeWave = 1;
+    let arcadePhase = 'playing';
+    let arcadeFrameCount = 0;
+    let waveEnemyCount = 0;
+    let waveEnemySpawned = 0;
+    let enemiesKilled = 0;
+    let bossActive = false;
+    let boss = null;
+    let keysDown = {};
+    let arcadeAutoShoot = true; // Always auto-shoot on mobile
+    let punishmentTriggered = {};
+    let prizeTriggered = {};
+    let waveTransitionTimer = 0;
+    let screenFlash = 0;
+
+    const ARCADE_PRIZES = [
+      { wave: 1, enemyIndex: 3, prize: { icon: '🥤', title: '+1 Malteada!', desc: 'Ganaste una malteada!', tag: '+1 malteada' }},
+      { wave: 3, enemyIndex: 4, prize: { icon: '🍦', title: '+1 Helado!', desc: 'Ganaste un helado!', tag: '+1 helado' }},
+      { wave: 5, enemyIndex: 3, prize: { icon: '🍟', title: '+1 Salchipapa!', desc: 'Ganaste una salchipapa!', tag: '+1 salchipapa' }},
+      { wave: 6, enemyIndex: 5, prize: { icon: '🧁', title: '+1 Cupcake!', desc: 'Ganaste un cupcake!', tag: '+1 cupcake' }},
+      { wave: 8, enemyIndex: 3, prize: { icon: '🍔', title: '+1 Hamburguesa!', desc: 'Ganaste una hamburguesa!', tag: '+1 hamburguesa' }},
+      { wave: 9, enemyIndex: 4, prize: { icon: '🍩', title: '+1 Dona!', desc: 'Ganaste una dona!', tag: '+1 dona' }},
+      { wave: 10, enemyIndex: 6, prize: { icon: '🥤', title: '+1 Malteada doble!', desc: 'Ganaste una malteada doble!', tag: '+1 malteada doble' }},
+    ];
+    const ARCADE_PUNISHMENTS = [
+      { wave: 2, frame: 280, punishment: { icon: '🍔', title: '-1 Hamburguesa!', desc: 'Le debes una hamburguesa a Nico!', tag: '-1 hamburguesa' }},
+      { wave: 4, frame: 250, punishment: { icon: '🍦🍟', title: '-1 Helado con papitas!', desc: 'Le debes un helado con papitas del McDonalds a Nico!', tag: '-1 helado con papitas' }},
+      { wave: 7, frame: 260, punishment: { icon: '🌮', title: '-1 Tacos!', desc: 'Le debes unos tacos a Nico!', tag: '-1 tacos' }},
+      { wave: 9, frame: 270, punishment: { icon: '🍿', title: '-1 Cine!', desc: 'Le debes una ida al cine a Nico!', tag: '-1 ida al cine' }},
+    ];
+
+    function initStars() {
+      stars = [];
+      for (let layer = 0; layer < 3; layer++) {
+        for (let i = 0; i < 25; i++) {
+          stars.push({
+            x: Math.random() * 500,
+            y: Math.random() * 700,
+            size: 0.5 + layer * 0.6 + Math.random() * 0.5,
+            speed: 0.2 + layer * 0.4,
+            layer,
+            brightness: 0.2 + Math.random() * 0.5,
+            twinkleSpeed: 0.02 + Math.random() * 0.03,
+            color: layer === 2 ? (Math.random() > 0.7 ? '#c77dff' : '#fff') : '#fff',
+          });
+        }
+      }
+    }
+
+    function startArcadeGame() {
+      document.getElementById('arcade-screen').style.display = 'block';
+      arcadeCanvas = document.getElementById('arcade-canvas');
+      arcadeCtx = arcadeCanvas.getContext('2d');
+
+      const dpr = window.devicePixelRatio || 1;
+      const maxW = Math.min(window.innerWidth - 20, 480);
+      arcadeW = maxW;
+      arcadeH = Math.min(maxW * 1.4, window.innerHeight * 0.65);
+      arcadeCanvas.width = arcadeW * dpr;
+      arcadeCanvas.height = arcadeH * dpr;
+      arcadeCanvas.style.width = arcadeW + 'px';
+      arcadeCanvas.style.height = arcadeH + 'px';
+      arcadeCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      ship.x = arcadeW / 2;
+      ship.y = arcadeH - 50;
+      ship.trail = [];
+      ship.invincible = 0;
+      arcadeLives = 5;
+      arcadeWave = 0;
+      arcadePhase = 'waveTransition';
+      waveTransitionTimer = 90;
+      bullets = []; enemies = []; enemyBullets = []; particles = []; drops = [];
+      bossActive = false; boss = null;
+      arcadeFrameCount = 0; waveEnemySpawned = 0; enemiesKilled = 0;
+      punishmentTriggered = {}; prizeTriggered = {};
+      screenFlash = 0;
+      arcadeRunning = true;
+      arcadeAutoShoot = true;
+
+      initStars();
+
+      // Input
+      document.addEventListener('keydown', arcadeKeyDown);
+      document.addEventListener('keyup', arcadeKeyUp);
+      arcadeCanvas.addEventListener('touchstart', arcadeTouchStart, { passive: false });
+      arcadeCanvas.addEventListener('touchmove', arcadeTouchMove, { passive: false });
+      arcadeCanvas.addEventListener('touchend', arcadeTouchEnd, { passive: false });
+
+      updateArcadeLives();
+      updateArcadeWave();
+      setMoritaArcade('stand');
+      startNextWave();
+      requestAnimationFrame(arcadeLoop);
+    }
+
+    function arcadeKeyDown(e) {
+      keysDown[e.key] = true;
+      if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
+    }
+    function arcadeKeyUp(e) { keysDown[e.key] = false; }
+
+    let touchActive = false;
+    let touchStartX = 0;
+    let shipStartX = 0;
+    function arcadeTouchStart(e) {
+      e.preventDefault();
+      touchActive = true;
+      touchStartX = e.touches[0].clientX;
+      shipStartX = ship.x;
+    }
+    function arcadeTouchMove(e) {
+      e.preventDefault();
+      if (!touchActive) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      ship.x = Math.max(ship.w/2, Math.min(arcadeW - ship.w/2, shipStartX + dx));
+    }
+    function arcadeTouchEnd(e) { touchActive = false; }
+
+    function startNextWave() {
+      arcadeWave++;
+      if (arcadeWave > 10) { spawnBoss(); return; }
+      arcadePhase = 'waveTransition';
+      waveTransitionTimer = 90;
+      arcadeFrameCount = 0;
+      waveEnemySpawned = 0;
+      const counts = { 1: 5, 2: 6, 3: 7, 4: 8, 5: 9, 6: 10, 7: 11, 8: 12, 9: 13, 10: 14 };
+      waveEnemyCount = counts[arcadeWave] || 10;
+      updateArcadeWave();
+    }
+
+    function spawnEnemy(wave) {
+      const x = 30 + Math.random() * (arcadeW - 60);
+      const speed = 0.7 + Math.random() * 0.6 + wave * 0.25;
+      const canShoot = wave >= 2 && Math.random() > 0.4;
+      const isSpecial = ARCADE_PRIZES.some(p => p.wave === wave && p.enemyIndex === waveEnemySpawned && !prizeTriggered[wave + '-' + p.enemyIndex]);
+      const types = ['octagon', 'diamond', 'circle'];
+      const type = types[Math.floor(Math.random() * types.length)];
+
+      enemies.push({
+        x, y: -25, w: 26 + wave * 2, h: 26 + wave * 2,
+        speed, canShoot, shootTimer: 80 + Math.floor(Math.random() * 120),
+        hp: isSpecial ? 3 : (wave === 3 ? 2 : 1),
+        special: isSpecial, wave, index: waveEnemySpawned,
+        type, angle: Math.random() * Math.PI * 2,
+        wobble: (Math.random() - 0.5) * 2,
+      });
+      waveEnemySpawned++;
+    }
+
+    function spawnBoss() {
+      bossActive = true;
+      arcadePhase = 'bossIntro';
+      waveTransitionTimer = 120;
+      arcadeFrameCount = 0;
+      boss = {
+        x: arcadeW / 2, y: -100, targetY: 90,
+        w: 60, h: 60, hp: 35, maxHp: 35,
+        speed: 2.5, dir: 1, shootTimer: 0, pattern: 0,
+        enterProgress: 0,
+      };
+    }
+
+    function arcadeLoop() {
+      if (!arcadeRunning) return;
+      arcadeUpdate();
+      arcadeDraw();
+      requestAnimationFrame(arcadeLoop);
+    }
+
+    function arcadeUpdate() {
+      arcadeFrameCount++;
+
+      // Stars parallax
+      stars.forEach(s => {
+        s.y += s.speed;
+        if (s.y > arcadeH) { s.y = -2; s.x = Math.random() * arcadeW; }
+      });
+
+      // Wave transition
+      if (arcadePhase === 'waveTransition') {
+        waveTransitionTimer--;
+        if (waveTransitionTimer <= 0) arcadePhase = 'playing';
+        return;
+      }
+
+      // Boss intro
+      if (arcadePhase === 'bossIntro') {
+        boss.enterProgress = Math.min(1, boss.enterProgress + 0.012);
+        boss.y = -100 + (boss.targetY + 100) * boss.enterProgress;
+        waveTransitionTimer--;
+        if (waveTransitionTimer <= 0) arcadePhase = 'boss';
+        // Still allow ship movement during intro
+      }
+
+      // Ship movement
+      if (keysDown['ArrowLeft'] || keysDown['a']) ship.x = Math.max(ship.w/2, ship.x - ship.speed);
+      if (keysDown['ArrowRight'] || keysDown['d']) ship.x = Math.min(arcadeW - ship.w/2, ship.x + ship.speed);
+
+      // Ship trail
+      ship.trail.push({ x: ship.x, y: ship.y, life: 8 });
+      ship.trail = ship.trail.filter(t => { t.life--; return t.life > 0; });
+
+      // Invincibility timer
+      if (ship.invincible > 0) ship.invincible--;
+
+      // Auto-shooting
+      const now = performance.now();
+      if ((keysDown[' '] || keysDown['ArrowUp'] || arcadeAutoShoot) && now - ship.lastShot > 180) {
+        bullets.push({ x: ship.x - 8, y: ship.y - ship.h/2, speed: 8 });
+        bullets.push({ x: ship.x + 8, y: ship.y - ship.h/2, speed: 8 });
+        ship.lastShot = now;
+      }
+
+      // Spawn enemies
+      if (arcadePhase === 'playing' && waveEnemySpawned < waveEnemyCount && arcadeFrameCount % 35 === 0) {
+        spawnEnemy(arcadeWave);
+      }
+
+      // Check wave complete
+      if (arcadePhase === 'playing' && waveEnemySpawned >= waveEnemyCount && enemies.length === 0 && drops.length === 0) {
+        startNextWave();
+      }
+
+      // Scripted punishments
+      ARCADE_PUNISHMENTS.forEach(p => {
+        const key = p.wave + '-' + p.frame;
+        if (arcadeWave === p.wave && arcadeFrameCount === p.frame && !punishmentTriggered[key]) {
+          punishmentTriggered[key] = true;
+          enemyBullets.push({ x: ship.x, y: 0, speed: 7, scripted: true });
+        }
+      });
+
+      // Update bullets
+      bullets = bullets.filter(b => { b.y -= b.speed; return b.y > -10; });
+
+      // Update enemy bullets
+      enemyBullets = enemyBullets.filter(b => {
+        b.y += b.speed;
+        if (ship.invincible <= 0 && Math.abs(b.x - ship.x) < ship.w/2 && Math.abs(b.y - ship.y) < ship.h/2) {
+          arcadeHit(b.scripted);
+          return false;
+        }
+        return b.y < arcadeH + 10;
+      });
+
+      // Update enemies
+      enemies.forEach(e => {
+        e.y += e.speed;
+        e.x += Math.sin(arcadeFrameCount * 0.03 + e.wobble) * 0.5;
+        e.angle += 0.02;
+        e.shootTimer--;
+        if (e.canShoot && e.shootTimer <= 0 && e.y > 20 && e.y < arcadeH * 0.6) {
+          e.shootTimer = 70 + Math.floor(Math.random() * 60);
+          const dx = ship.x - e.x;
+          const dy = ship.y - e.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          enemyBullets.push({ x: e.x, y: e.y + e.h/2, speed: 2.5, vx: (dx/dist)*2.5, vy: (dy/dist)*2.5 });
+        }
+        // Collision with ship
+        if (ship.invincible <= 0 && e.y > 0 && Math.abs(e.x - ship.x) < (e.w + ship.w)/2 * 0.7 && Math.abs(e.y - ship.y) < (e.h + ship.h)/2 * 0.7) {
+          arcadeHit(false);
+          e.hp = 0;
+          e.y = 9999;
+        }
+      });
+      enemies = enemies.filter(e => e.y < arcadeH + 30 && e.hp > 0);
+
+      // Bullet-enemy collisions
+      for (let bi = bullets.length - 1; bi >= 0; bi--) {
+        const b = bullets[bi];
+        for (let ei = enemies.length - 1; ei >= 0; ei--) {
+          const e = enemies[ei];
+          if (Math.abs(b.x - e.x) < e.w/2 + 6 && Math.abs(b.y - e.y) < e.h/2 + 6) {
+            e.hp--;
+            bullets.splice(bi, 1);
+            // Hit particles
+            for (let i = 0; i < 4; i++) {
+              particles.push({ x: b.x, y: b.y, vx: (Math.random()-0.5)*3, vy: (Math.random()-0.5)*3, life: 12, size: 3, color: e.special ? '#fbbf24' : '#c77dff' });
+            }
+            if (e.hp <= 0) {
+              // Explosion
+              for (let i = 0; i < 10; i++) {
+                particles.push({ x: e.x, y: e.y, vx: (Math.random()-0.5)*5, vy: (Math.random()-0.5)*5, life: 20 + Math.random()*15, size: 2 + Math.random()*4, color: e.special ? '#fbbf24' : ['#c77dff','#9b4dca','#ff6b9d'][Math.floor(Math.random()*3)] });
+              }
+              if (e.special) {
+                const prizeInfo = ARCADE_PRIZES.find(p => p.wave === e.wave && p.enemyIndex === e.index);
+                if (prizeInfo) {
+                  prizeTriggered[e.wave + '-' + e.index] = true;
+                  drops.push({ x: e.x, y: e.y, speed: 1.5, prize: prizeInfo.prize, glow: 0 });
+                  setMoritaArcade('stand');
+                }
+              }
+              enemies.splice(ei, 1);
+              enemiesKilled++;
+            }
+            break;
+          }
+        }
+      }
+
+      // Bullet-boss collision
+      if (arcadePhase === 'boss' && boss && boss.hp > 0) {
+        for (let bi = bullets.length - 1; bi >= 0; bi--) {
+          const b = bullets[bi];
+          if (Math.abs(b.x - boss.x) < boss.w/2 + 6 && Math.abs(b.y - boss.y) < boss.h/2 + 6) {
+            boss.hp--;
+            bullets.splice(bi, 1);
+            for (let i = 0; i < 3; i++) {
+              particles.push({ x: b.x, y: b.y, vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*4, life: 15, size: 3, color: '#ff6b9d' });
+            }
+            if (boss.hp <= 0) { arcadeWin(); return; }
+          }
+        }
+
+        // Boss AI - semi-random patterns that look player-controlled
+        boss.x += boss.speed * boss.dir;
+        // Occasionally change direction (looks like player control)
+        if (boss.x > arcadeW - boss.w/2 - 10) boss.dir = -1;
+        if (boss.x < boss.w/2 + 10) boss.dir = 1;
+        if (Math.random() < 0.015) boss.dir *= -1;
+        // Vary speed slightly
+        boss.speed = 2 + Math.sin(arcadeFrameCount * 0.02) * 1;
+
+        boss.shootTimer++;
+        if (boss.shootTimer > 25) {
+          boss.shootTimer = 0;
+          boss.pattern = (boss.pattern + 1) % 4;
+          if (boss.pattern === 0) {
+            enemyBullets.push({ x: boss.x, y: boss.y + boss.h/2, speed: 3.5, vx: 0, vy: 3.5 });
+          } else if (boss.pattern === 1) {
+            for (let a = -1; a <= 1; a++) {
+              enemyBullets.push({ x: boss.x + a*25, y: boss.y + boss.h/2, speed: 3, vx: a*0.8, vy: 3 });
+            }
+          } else if (boss.pattern === 2) {
+            // Aimed but offset
+            enemyBullets.push({ x: boss.x, y: boss.y + boss.h/2, speed: 4, vx: (ship.x - boss.x)*0.02, vy: 4 });
+          } else {
+            // Spread
+            for (let i = 0; i < 5; i++) {
+              const a = (i/5 - 0.4) * Math.PI * 0.6;
+              enemyBullets.push({ x: boss.x, y: boss.y + boss.h/2, speed: 2.5, vx: Math.sin(a)*2.5, vy: Math.cos(a)*2.5 });
+            }
+          }
+        }
+      }
+
+      // Update enemy bullets (with velocity vectors)
+      enemyBullets = enemyBullets.filter(b => {
+        if (b.vx !== undefined) { b.x += b.vx; b.y += b.vy; }
+        else { b.y += b.speed; }
+        if (ship.invincible <= 0 && Math.abs(b.x - ship.x) < ship.w/2 && Math.abs(b.y - ship.y) < ship.h/2) {
+          arcadeHit(b.scripted);
+          return false;
+        }
+        return b.y < arcadeH + 10 && b.y > -10 && b.x > -10 && b.x < arcadeW + 10;
+      });
+
+      // Update drops
+      drops = drops.filter(d => {
+        d.y += d.speed;
+        d.glow += 0.08;
+        if (Math.abs(d.x - ship.x) < ship.w/2 + 16 && Math.abs(d.y - ship.y) < ship.h/2 + 16) {
+          collectedPrizes.push(d.prize);
+          updateArcadePrizes();
+          moritaCelebrate();
+          screenFlash = 10;
+          for (let i = 0; i < 8; i++) {
+            particles.push({ x: d.x, y: d.y, vx: (Math.random()-0.5)*6, vy: (Math.random()-0.5)*6, life: 20, size: 3, color: '#fbbf24' });
+          }
+          return false;
+        }
+        return d.y < arcadeH + 20;
+      });
+
+      // Update particles
+      particles = particles.filter(p => { p.x += p.vx; p.y += p.vy; p.life--; return p.life > 0; });
+
+      // Screen flash decay
+      if (screenFlash > 0) screenFlash--;
+    }
+
+    function arcadeHit(isScripted) {
+      if (ship.invincible > 0) return;
+      arcadeLives--;
+      ship.invincible = 90; // 1.5 seconds invincibility
+      updateArcadeLives();
+      setMoritaArcade('down');
+      triggerShake();
+      screenFlash = 15;
+      setTimeout(() => setMoritaArcade('sit'), 1000);
+
+      // Explosion at ship
+      for (let i = 0; i < 12; i++) {
+        particles.push({ x: ship.x, y: ship.y, vx: (Math.random()-0.5)*6, vy: (Math.random()-0.5)*6, life: 20, size: 3, color: '#ff6b9d' });
+      }
+
+      if (isScripted) {
+        const p = ARCADE_PUNISHMENTS.find(p => p.wave === arcadeWave && !collectedPrizes.some(c => c.tag === p.punishment.tag));
+        if (p) {
+          collectedPrizes.push(p.punishment);
+          updateArcadePrizes();
+          showTimedDialogue({ name: 'Nico', text: p.punishment.desc });
+          setTimeout(() => document.getElementById('dialogue-box').style.display = 'none', 2500);
+        }
+      }
+      if (arcadeLives <= 0) arcadeLives = 1;
+    }
+
+    function arcadeWin() {
+      arcadePhase = 'won';
+      arcadeRunning = false;
+      bossActive = false;
+
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x: boss.x + (Math.random()-0.5)*boss.w*2, y: boss.y + (Math.random()-0.5)*boss.h*2,
+          vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
+          life: 40 + Math.random()*25, size: 3 + Math.random()*5,
+          color: ['#ff6b9d','#c77dff','#fbbf24','#4ade80','#60a5fa'][Math.floor(Math.random()*5)],
+        });
+      }
+      arcadeDraw();
+      launchConfetti(80);
+      moritaCelebrate();
+
+      document.removeEventListener('keydown', arcadeKeyDown);
+      document.removeEventListener('keyup', arcadeKeyUp);
+
+      setTimeout(() => {
+        document.getElementById('arcade-screen').style.display = 'none';
+        triggerPostGame();
+      }, 2500);
+    }
+
+    function arcadeDraw() {
+      const ctx = arcadeCtx;
+
+      // Background gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, arcadeH);
+      bgGrad.addColorStop(0, '#05051a');
+      bgGrad.addColorStop(0.5, '#0a0825');
+      bgGrad.addColorStop(1, '#10082e');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, arcadeW, arcadeH);
+
+      // Parallax stars
+      stars.forEach(s => {
+        const twinkle = 0.4 + Math.sin(arcadeFrameCount * s.twinkleSpeed + s.x) * 0.3;
+        ctx.fillStyle = s.color;
+        ctx.globalAlpha = s.brightness * twinkle;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+
+      // Ship trail
+      ship.trail.forEach(t => {
+        ctx.fillStyle = `rgba(199,125,255,${t.life/8 * 0.15})`;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y + 10, 4 + (8 - t.life), 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Ship
+      const shipAlpha = ship.invincible > 0 ? (Math.sin(arcadeFrameCount * 0.4) > 0 ? 1 : 0.3) : 1;
+      ctx.globalAlpha = shipAlpha;
+
+      // Ship body
+      ctx.fillStyle = '#c77dff';
+      ctx.beginPath();
+      ctx.moveTo(ship.x, ship.y - ship.h/2 - 4);
+      ctx.lineTo(ship.x - 6, ship.y - ship.h/2 + 6);
+      ctx.lineTo(ship.x - ship.w/2, ship.y + ship.h/2);
+      ctx.lineTo(ship.x - 4, ship.y + ship.h/2 - 4);
+      ctx.lineTo(ship.x + 4, ship.y + ship.h/2 - 4);
+      ctx.lineTo(ship.x + ship.w/2, ship.y + ship.h/2);
+      ctx.lineTo(ship.x + 6, ship.y - ship.h/2 + 6);
+      ctx.closePath();
+      ctx.fill();
+
+      // Lunna's face in the cockpit
+      if (IMG.lunna && IMG.lunna.complete) {
+        const headSize = 18;
+        ctx.drawImage(IMG.lunna, ship.x - headSize/2, ship.y - headSize/2 - 4, headSize, headSize);
+      } else {
+        ctx.fillStyle = '#e0b0ff';
+        ctx.beginPath();
+        ctx.arc(ship.x, ship.y - 2, 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Ship wings detail
+      ctx.fillStyle = '#9b4dca';
+      ctx.fillRect(ship.x - ship.w/2 - 2, ship.y + ship.h/2 - 6, 8, 4);
+      ctx.fillRect(ship.x + ship.w/2 - 6, ship.y + ship.h/2 - 6, 8, 4);
+
+      // Engine flames
+      const flameH = 6 + Math.random() * 8;
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.moveTo(ship.x - 6, ship.y + ship.h/2 - 4);
+      ctx.lineTo(ship.x, ship.y + ship.h/2 + flameH);
+      ctx.lineTo(ship.x + 6, ship.y + ship.h/2 - 4);
+      ctx.fill();
+      ctx.fillStyle = '#ff6b9d';
+      ctx.beginPath();
+      ctx.moveTo(ship.x - 3, ship.y + ship.h/2 - 2);
+      ctx.lineTo(ship.x, ship.y + ship.h/2 + flameH * 0.6);
+      ctx.lineTo(ship.x + 3, ship.y + ship.h/2 - 2);
+      ctx.fill();
+
+      // Ship glow
+      const shipGlow = ctx.createRadialGradient(ship.x, ship.y, 0, ship.x, ship.y, ship.w * 1.2);
+      shipGlow.addColorStop(0, 'rgba(199,125,255,0.08)');
+      shipGlow.addColorStop(1, 'rgba(199,125,255,0)');
+      ctx.fillStyle = shipGlow;
+      ctx.fillRect(ship.x - ship.w*1.5, ship.y - ship.h*1.5, ship.w*3, ship.h*3);
+
+      ctx.globalAlpha = 1;
+
+      // Player bullets
+      bullets.forEach(b => {
+        ctx.fillStyle = '#4ade80';
+        ctx.shadowColor = '#4ade80';
+        ctx.shadowBlur = 6;
+        ctx.fillRect(b.x - 1.5, b.y - 8, 3, 14);
+        ctx.shadowBlur = 0;
+      });
+
+      // Enemy bullets
+      enemyBullets.forEach(b => {
+        ctx.fillStyle = '#ff6b9d';
+        ctx.shadowColor = '#ff6b9d';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      // Enemies
+      enemies.forEach(e => {
+        ctx.save();
+        ctx.translate(e.x, e.y);
+
+        if (e.special) {
+          // Special enemy - glowing rotating star
+          ctx.rotate(e.angle);
+          const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, e.w);
+          grad.addColorStop(0, 'rgba(251,191,36,0.3)');
+          grad.addColorStop(1, 'rgba(251,191,36,0)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(-e.w, -e.w, e.w*2, e.w*2);
+
+          ctx.fillStyle = '#fbbf24';
+          // 6-point star
+          for (let i = 0; i < 6; i++) {
+            const a1 = (i/6) * Math.PI * 2;
+            const a2 = ((i+0.5)/6) * Math.PI * 2;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(Math.cos(a1)*e.w/2, Math.sin(a1)*e.w/2);
+            ctx.lineTo(Math.cos(a2)*e.w/3.5, Math.sin(a2)*e.w/3.5);
+            ctx.fill();
+          }
+          // Center
+          ctx.fillStyle = '#fff8e1';
+          ctx.beginPath();
+          ctx.arc(0, 0, e.w/5, 0, Math.PI*2);
+          ctx.fill();
+        } else {
+          // Different enemy types per wave
+          if (e.type === 'octagon' || arcadeWave === 1) {
+            // Spiky blob
+            ctx.fillStyle = arcadeWave === 1 ? '#9b4dca' : arcadeWave === 2 ? '#e91e63' : '#ff5722';
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+              const a = (i/8) * Math.PI * 2 + e.angle * 0.5;
+              const r = i % 2 === 0 ? e.w/2 : e.w/3;
+              const px = Math.cos(a) * r;
+              const py = Math.sin(a) * r;
+              if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+            ctx.fill();
+          } else if (e.type === 'diamond') {
+            ctx.fillStyle = arcadeWave === 2 ? '#e040fb' : '#f44336';
+            ctx.rotate(Math.PI/4 + Math.sin(arcadeFrameCount*0.05)*0.15);
+            ctx.fillRect(-e.w/2.5, -e.h/2.5, e.w/1.25, e.h/1.25);
+          } else {
+            ctx.fillStyle = arcadeWave === 2 ? '#ab47bc' : '#d32f2f';
+            ctx.beginPath();
+            ctx.arc(0, 0, e.w/2, 0, Math.PI*2);
+            ctx.fill();
+          }
+
+          // Eyes
+          ctx.fillStyle = '#fff';
+          ctx.beginPath();
+          ctx.arc(-4, -3, 4, 0, Math.PI*2);
+          ctx.arc(4, -3, 4, 0, Math.PI*2);
+          ctx.fill();
+          ctx.fillStyle = '#1a1a3e';
+          ctx.beginPath();
+          ctx.arc(-3, -2, 2, 0, Math.PI*2);
+          ctx.arc(5, -2, 2, 0, Math.PI*2);
+          ctx.fill();
+
+          // HP indicator for tough enemies
+          if (e.hp > 1) {
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.font = '10px "Fredoka One"';
+            ctx.textAlign = 'center';
+            ctx.fillText(e.hp, 0, e.h/2 + 10);
+          }
+        }
+        ctx.restore();
+      });
+
+      // Prize drops
+      drops.forEach(d => {
+        // Glow
+        const dGlow = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, 20);
+        dGlow.addColorStop(0, `rgba(251,191,36,${0.2 + Math.sin(d.glow)*0.1})`);
+        dGlow.addColorStop(1, 'rgba(251,191,36,0)');
+        ctx.fillStyle = dGlow;
+        ctx.fillRect(d.x - 20, d.y - 20, 40, 40);
+
+        ctx.font = '24px serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(d.prize.icon, d.x, d.y);
+      });
+
+      // Boss
+      if (boss && boss.hp > 0) {
+        // Boss glow
+        const bossGlow = ctx.createRadialGradient(boss.x, boss.y, 0, boss.x, boss.y, boss.w * 1.2);
+        bossGlow.addColorStop(0, 'rgba(79,195,247,0.15)');
+        bossGlow.addColorStop(1, 'rgba(79,195,247,0)');
+        ctx.fillStyle = bossGlow;
+        ctx.fillRect(boss.x - boss.w*1.2, boss.y - boss.h*1.2, boss.w*2.4, boss.h*2.4);
+
+        // Boss ship body (inverted triangle - menacing)
+        ctx.fillStyle = '#4fc3f7';
+        ctx.beginPath();
+        ctx.moveTo(boss.x, boss.y + boss.h/2 + 8);
+        ctx.lineTo(boss.x - 10, boss.y + boss.h/2 - 4);
+        ctx.lineTo(boss.x - boss.w/2 - 8, boss.y - boss.h/2);
+        ctx.lineTo(boss.x - 8, boss.y - boss.h/2 + 8);
+        ctx.lineTo(boss.x + 8, boss.y - boss.h/2 + 8);
+        ctx.lineTo(boss.x + boss.w/2 + 8, boss.y - boss.h/2);
+        ctx.lineTo(boss.x + 10, boss.y + boss.h/2 - 4);
+        ctx.closePath();
+        ctx.fill();
+
+        // Boss ship wings
+        ctx.fillStyle = '#0288d1';
+        ctx.fillRect(boss.x - boss.w/2 - 12, boss.y - boss.h/2 - 4, 14, 8);
+        ctx.fillRect(boss.x + boss.w/2 - 2, boss.y - boss.h/2 - 4, 14, 8);
+
+        // Nico's face inside the boss ship
+        if (IMG.nico && IMG.nico.complete) {
+          const headSize = boss.w * 0.55;
+          ctx.drawImage(IMG.nico, boss.x - headSize/2, boss.y - headSize/2 - 2, headSize, headSize);
+        }
+
+        // HP bar background
+        const hpBarW = boss.w * 1.4;
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        ctx.beginPath();
+        ctx.roundRect(boss.x - hpBarW/2, boss.y - boss.h/2 - 20, hpBarW, 8, 4);
+        ctx.fill();
+        // HP bar fill
+        ctx.fillStyle = boss.hp > boss.maxHp * 0.3 ? '#4fc3f7' : '#ff6b9d';
+        ctx.beginPath();
+        ctx.roundRect(boss.x - hpBarW/2, boss.y - boss.h/2 - 20, hpBarW * (boss.hp/boss.maxHp), 8, 4);
+        ctx.fill();
+        // Boss name
+        ctx.fillStyle = '#4fc3f7';
+        ctx.font = '12px "Fredoka One"';
+        ctx.textAlign = 'center';
+        ctx.fillText('NICO', boss.x, boss.y - boss.h/2 - 26);
+      }
+
+      // Particles
+      particles.forEach(p => {
+        ctx.globalAlpha = Math.min(1, p.life / 15);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * (p.life / 20), 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+
+      // Screen flash
+      if (screenFlash > 0) {
+        ctx.fillStyle = `rgba(255,255,255,${screenFlash / 30})`;
+        ctx.fillRect(0, 0, arcadeW, arcadeH);
+      }
+
+      // Wave/Boss announcements
+      if (arcadePhase === 'waveTransition') {
+        const progress = 1 - waveTransitionTimer / 90;
+        ctx.globalAlpha = progress < 0.5 ? progress * 2 : (1 - progress) * 2;
+        ctx.fillStyle = '#e0b0ff';
+        ctx.font = 'bold 28px "Fredoka One"';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Oleada ${arcadeWave}`, arcadeW/2, arcadeH/2 - 10);
+        ctx.font = '14px "Nunito"';
+        ctx.fillStyle = '#c8b8e0';
+        ctx.fillText('Preparate!', arcadeW/2, arcadeH/2 + 20);
+        ctx.globalAlpha = 1;
+      }
+      if (arcadePhase === 'bossIntro') {
+        const progress = 1 - waveTransitionTimer / 120;
+        ctx.globalAlpha = progress < 0.3 ? progress * 3 : 1;
+        ctx.fillStyle = '#ff6b9d';
+        ctx.font = 'bold 28px "Fredoka One"';
+        ctx.textAlign = 'center';
+        ctx.fillText('BOSS FIGHT', arcadeW/2, arcadeH/2 + 30);
+        ctx.font = '16px "Fredoka One"';
+        ctx.fillStyle = '#4fc3f7';
+        ctx.fillText('NICO', arcadeW/2, arcadeH/2 + 55);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    function updateArcadeLives() {
+      const el = document.getElementById('arcade-lives');
+      el.textContent = 'Vidas: ' + '★'.repeat(Math.max(0, arcadeLives)) + '☆'.repeat(Math.max(0, 5 - arcadeLives));
+    }
+    function updateArcadeWave() {
+      document.getElementById('arcade-wave').textContent = 'Oleada: ' + (arcadeWave > 10 ? 'BOSS' : arcadeWave);
+    }
+    function updateArcadePrizes() {
+      const el = document.getElementById('arcade-prizes-list');
+      if (collectedPrizes.length === 0) { el.textContent = ''; return; }
+      el.textContent = collectedPrizes.map(p => p.icon + ' ' + p.tag).join(' | ');
+    }
+    function setMoritaArcade(state) {
+      const map = { stand: 'assets/dog_nobg.png', sit: 'assets/dog_sit_nobg.png', down: 'assets/dog_down_nobg.png' };
+      const el = document.getElementById('morita-img-arcade');
+      if (el) el.src = map[state] || map.sit;
+    }
+
+    function downloadAll(e) {
+      e.preventDefault();
+      const files = ['assets/gift.png', 'assets/gift_2.png'];
+      const names = ['lunna_y_morita.png', 'la_mora_de_morita.png'];
+      files.forEach((file, i) => {
+        const a = document.createElement('a');
+        a.href = file;
+        a.download = names[i];
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+    }
+
+    function startArcadeFromInstructions() {
+      document.getElementById('instructions-screen').classList.add('fade-out');
+      setTimeout(() => {
+        document.getElementById('instructions-screen').classList.add('hidden');
+        document.getElementById('instructions-screen').classList.remove('fade-out');
+        startArcadeGame();
+      }, 600);
+    }
+
+    // Wait for start button click
+  </script>
+</body>
+</html>
